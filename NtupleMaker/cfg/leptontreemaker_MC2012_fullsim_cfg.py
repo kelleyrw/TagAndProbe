@@ -8,8 +8,8 @@ process.load("Configuration.Geometry.GeometryIdeal_cff")
 process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.GlobalTag.globaltag = "START53_V7F::All"
-process.MessageLogger.cerr.FwkReport.reportEvery = 200
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(100))
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(-1))
 
 # lepton maker
 process.load("Smurf.ProcessingAndSkimming.leptontreemaker_cff")
@@ -18,6 +18,7 @@ process.load("Smurf.ProcessingAndSkimming.leptontreemaker_cff")
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
 		#'file:/home/users/rwkelley/Data/nfs-7/edm/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball_AODSIM_PU_S10_START53_V7A-v1_0000_00037C53-AAD1-E111-B1BE-003048D45F38.root'
+		#'file:/Users/rwk7t/Data/edm/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball_AODSIM_PU_S10_START53_V7A-v1_0000_00037C53-AAD1-E111-B1BE-003048D45F38.root'
 		'root://xrootd.unl.edu//store/mc/Summer12_DR53X/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball/AODSIM/PU_S10_START53_V7A-v1/0000/00037C53-AAD1-E111-B1BE-003048D45F38.root'
     )
 )
