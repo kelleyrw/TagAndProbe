@@ -12,7 +12,6 @@ namespace tnp
         {
             Muon,
             Electron,
-            Both,
             static_size
         };
     };
@@ -22,7 +21,7 @@ namespace tnp
     {
         enum value_type 
         {
-            // EGamma
+            // EGamma POG
             EGammaDenID,
             EGammaDenIso,
             EGammaDenBoth,

@@ -6,8 +6,14 @@ process = cms.PSet()
 # define the input datasets
 # ------------------------------------------------------------------------------------------------------------------- #
 
+# path to the lepton trees
 lepton_tree_path = "/Users/rwk7t/Data/babies/leptonTrees/tnp_V00-00-00"
-analysis_path = os.getenv("TNP")
+
+# path to the analysis
+analysis_path = os.getenv("CMSSW_BASE") + "/src/TagAndProbe/Analysis"
+
+# good run list
+run_list = cms.string(analysis_path+'/json/final_19p49fb.txt')
 
 
 ## DY fullsim
@@ -31,14 +37,14 @@ data_mu = cms.PSet(
 	name     = cms.string("data_mu"),
 	files    = cms.vstring([lepton_tree_path+'/DoubleMu_Run2012*/*.root']),
 	is_data  = cms.bool(True),
-	run_list = cms.string(analysis_path+'/json/final_19p49fb.txt')
+	run_list = run_list 
 )
 
 single_mu = cms.PSet(
 	name     = cms.string("data_single_mu"),
 	files    = cms.vstring(['/Users/rwk7t/Data/babies/LeptonTree/V00-02-09/SingleMu/merged_Moriond.root']),
 	is_data  = cms.bool(True),
-	run_list = cms.string(analysis_path+'/json/final_19p49fb.txt')
+	run_list = run_list 
 )
 
 ## electron triggered data 
@@ -46,14 +52,14 @@ data_el = cms.PSet(
 	name     = cms.string("data_el"),
 	files    = cms.vstring([lepton_tree_path+'/DoubleElectron_Run2012*/*.root']),
 	is_data  = cms.bool(True),
-	run_list = cms.string(analysis_path+'/json/final_19p49fb.txt')
+	run_list = run_list 
 )
 
 single_el = cms.PSet(
 	name     = cms.string("data_single_el"),
 	files    = cms.vstring(['/Users/rwk7t/Data/babies/LeptonTree/V00-02-09/SingleElectron/merged_Moriond.root']),
 	is_data  = cms.bool(True),
-	run_list = cms.string(analysis_path+'/json/final_19p49fb.txt')
+	run_list = run_list 
 )
 
 
@@ -66,21 +72,23 @@ datasets_mu = cms.VPSet(dy_full, single_mu)  # muons
 datasets_el = cms.VPSet(dy_full, single_el)  # electrons
 
 ## maximum number of events to run on
-max_events = cms.int64(100)
+max_events = cms.int64(1000)
 
 ## verbose print out for troubleshooting 
-verbose = cms.bool(True)
+# verbose = cms.bool(True)
+verbose = cms.bool(False)
 
 ## mass range for resonance window
-mass_low = cms.double(60.0)  # GeV
-mass_high = cms.double(120.0) # GeV
+mass_low       = cms.double(60.0)  # GeV
+mass_high      = cms.double(120.0) # GeV
+mass_bin_width = cms.double(2.0) # GeV
 
 ## path and name to histogram for Pile UP reweighting
 pileup_hist_file = cms.string("")
 pileup_hist_name = cms.string("")
 
 ## output label to give it a unique name
-output_label = cms.string("ss2012_v1")
+output_label = cms.string("ss2012_small")
  
 ## muons
 ## ------------------------------------------ #
@@ -98,8 +106,9 @@ ss2012_mu = cms.PSet(
 	verbose = verbose,
 
 	## mass range for resonance window
-	mass_low = mass_low,
-	mass_high = mass_high,
+	mass_low       = mass_low,
+	mass_high      = mass_high,
+	mass_bin_width = mass_bin_width,
 	
 	# datasets to run on
 	datasets = datasets_mu,
@@ -128,14 +137,15 @@ egamma_el = cms.PSet(
 	output_label = output_label,
  
 	## max number of events to run on
-	max_events  = max_events,
+	max_events = max_events,
 
 	## verbosity (for trouble shooting)
-	verbose     = verbose,
+	verbose = verbose,
 
 	## mass range for resonance window
-	mass_low    = mass_low,
-	mass_high   = mass_high,
+	mass_low       = mass_low,
+	mass_high      = mass_high,
+	mass_bin_width = mass_bin_width,
 	
 	# datasets to run on
 	datasets    = datasets_el,
@@ -157,8 +167,8 @@ egamma_el = cms.PSet(
 ## process to run to make the plots
 ## will make a set of plots for each element of the cms.VPSet
 ## ------------------------------------------ #
-# process.tnp_make_plots = cms.VPSet(egamma_el, ss2012_mu)
-process.tnp_make_plots = cms.VPSet(ss2012_mu)
+
+process.tnp_make_plots = cms.VPSet(egamma_el, ss2012_mu)
 
 ## ------------------------------------------------------------------------------------------------------------------- #
 ## Parameters for the fitting 
