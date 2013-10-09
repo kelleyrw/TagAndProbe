@@ -3,16 +3,17 @@ import os
 
 process = cms.PSet()
 
-# define the input datasets
-# ------------------------------------------------------------------------------------------------------------------- #
+## ------------------------------------------------------------------------------------------------------------------- #
+## define the input datasets
+## ------------------------------------------------------------------------------------------------------------------- #
 
-# path to the lepton trees
+## path to the lepton trees
 lepton_tree_path = "/Users/rwk7t/Data/babies/leptonTrees/tnp_V00-00-00"
 
-# path to the analysis
+## path to the analysis
 analysis_path = os.getenv("CMSSW_BASE") + "/src/TagAndProbe/Analysis"
 
-# good run list
+## good run list
 run_list = cms.string(analysis_path+'/json/final_19p49fb.txt')
 
 
@@ -34,7 +35,7 @@ dy_fast = cms.PSet(
 
 ## muon triggered data 
 data_mu = cms.PSet(
-	name     = cms.string("data_mu"),
+	name     = cms.string("data_double_mu"),
 	files    = cms.vstring([lepton_tree_path+'/DoubleMu_Run2012*/*.root']),
 	is_data  = cms.bool(True),
 	run_list = run_list 
@@ -49,7 +50,7 @@ single_mu = cms.PSet(
 
 ## electron triggered data 
 data_el = cms.PSet(
-	name     = cms.string("data_el"),
+	name     = cms.string("data_double_el"),
 	files    = cms.vstring([lepton_tree_path+'/DoubleElectron_Run2012*/*.root']),
 	is_data  = cms.bool(True),
 	run_list = run_list 
