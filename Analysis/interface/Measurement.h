@@ -5,15 +5,14 @@
 
 namespace tnp
 {
-    // simple mode type
-    struct Mode
+    // simple lepton type
+    struct Lepton
     {
         enum value_type 
         {
             Muon,
             Electron,
-            MuonMC,
-            ElectronMC,
+            Both,
             static_size
         };
     };
@@ -93,14 +92,17 @@ namespace tnp
         EG::MHITS
     );
 
-    // get the mode from a string
-    Mode::value_type GetModeFromString(const std::string& mode_name);
+    // get the lepton lepton from a string
+    Lepton::value_type GetLeptonFromString(const std::string& lepton_name);
+
+    // get the string from the lepton type 
+    std::string GetStringFromLepton(const Lepton::value_type lepton_type);
 
     // get the selection from a string
     Selection::value_type GetSelectionFromString(const std::string& sel_name);
 
     // passes selection based on above enum
-    bool PassesSelection(const Mode::value_type mode, const Selection::value_type selection);
+    bool PassesSelection(const Lepton::value_type lepton, const Selection::value_type selection, const bool is_data);
 
 } // namespace tnp
 

@@ -64,13 +64,20 @@ namespace tnp
     };
 
 
-    Mode::value_type GetModeFromString(const std::string& mode_name)
+    Lepton::value_type GetLeptonFromString(const std::string& lepton_name)
     {
-        if (lt::string_lower(mode_name) == "muon"      ) {return Mode::Muon;      }
-        if (lt::string_lower(mode_name) == "muonmc"    ) {return Mode::MuonMC;    }
-        if (lt::string_lower(mode_name) == "electron"  ) {return Mode::Electron;  }
-        if (lt::string_lower(mode_name) == "electronmc") {return Mode::ElectronMC;}
-        throw std::invalid_argument("[tnp::GetModFromString]: ERROR - invalid value!"); 
+        if (lt::string_lower(lepton_name) == "muon"      ) {return Lepton::Muon;    }
+        if (lt::string_lower(lepton_name) == "electron"  ) {return Lepton::Electron;}
+        if (lt::string_lower(lepton_name) == "both"      ) {return Lepton::Both;    }
+        throw std::invalid_argument("[tnp::GetLeptonFromString]: ERROR - invalid value!"); 
+    }
+
+    std::string GetStringFromLepton(const Lepton::value_type lepton_type)
+    {
+        if (lepton_type == Lepton::Muon    ) return "muon";
+        if (lepton_type == Lepton::Electron) return "electron";
+        if (lepton_type == Lepton::Both    ) return "both";
+        throw std::invalid_argument("[tnp::GetStringFromLepton]: ERROR - invalid value!"); 
     }
 
     Selection::value_type GetSelectionFromString(const std::string& sel_name)
@@ -91,15 +98,12 @@ namespace tnp
     }
 
     // passes selection based on above enum
-    bool PassesSelection(const Mode::value_type mode, const Selection::value_type selection)
+    bool PassesSelection(const Lepton::value_type lepton, const Selection::value_type selection, const bool is_data)
     {
         using namespace lepton_tree;
 
-        // data or MC
-        const bool is_data = (mode == Mode::Electron || mode == Mode::Muon);
-
         // electrons
-        if (mode == Mode::Electron || mode == Mode::ElectronMC)
+        if (lepton == Lepton::Electron)
         {
             // cut values and variables
             const float el_is_barrel   = fabs(sceta()) < 1.4442;
@@ -223,7 +227,7 @@ namespace tnp
         }
 
         // muons
-        if (mode == Mode::Muon || mode == Mode::MuonMC)
+        if (lepton == Lepton::Muon)
         {
             // cut values and variables
             const float mu_tag_pt      = tag().pt();
