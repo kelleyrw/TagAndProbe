@@ -15,8 +15,8 @@ namespace tnp
 {
     Lepton::value_type GetLeptonFromString(const std::string& lepton_name)
     {
-        if (lt::string_lower(lepton_name) == "muon"      ) {return Lepton::Muon;    }
-        if (lt::string_lower(lepton_name) == "electron"  ) {return Lepton::Electron;}
+        if (lt::string_lower(lepton_name) == "muon"    ) {return Lepton::Muon;    }
+        if (lt::string_lower(lepton_name) == "electron") {return Lepton::Electron;}
         throw std::invalid_argument("[tnp::GetLeptonFromString]: ERROR - invalid value!"); 
     }
 
@@ -24,7 +24,7 @@ namespace tnp
     {
         if (lepton_type == Lepton::Muon    ) return "muon";
         if (lepton_type == Lepton::Electron) return "electron";
-        throw std::invalid_argument("[tnp::GetStringFromLepton]: ERROR - invalid value!"); 
+        throw std::invalid_argument(Form("[tnp::GetStringFromLepton]: ERROR - invalid value! %u", lepton_type)); 
     }
 
     Selection::value_type GetSelectionFromString(const std::string& sel_name)
@@ -42,6 +42,23 @@ namespace tnp
         if (lt::string_lower(sel_name) == "samesignmudenboth") {return Selection::SameSignMuDenBoth;} 
         if (lt::string_lower(sel_name) == "samesignmunum"    ) {return Selection::SameSignMuNum;    } 
         throw std::invalid_argument("[tnp::GetSelectionFromString]: ERROR - invalid value!"); 
+    }
+
+    std::string GetStringFromSelection(const Selection::value_type sel_type)
+    {
+        if (sel_type == Selection::EGammaDenID       ) return "egammadenid";
+        if (sel_type == Selection::EGammaDenIso      ) return "egammadeniso";
+        if (sel_type == Selection::EGammaDenBoth     ) return "egammadenboth";
+        if (sel_type == Selection::EGammaNum         ) return "egammanum";
+        if (sel_type == Selection::SameSignElDenID   ) return "samesigneldenid";
+        if (sel_type == Selection::SameSignElDenIso  ) return "samesigneldeniso";
+        if (sel_type == Selection::SameSignElDenBoth ) return "samesigneldenboth";
+        if (sel_type == Selection::SameSignElNum     ) return "samesignelnum";
+        if (sel_type == Selection::SameSignMuDenID   ) return "samesignmudenid";
+        if (sel_type == Selection::SameSignMuDenIso  ) return "samesignmudeniso";
+        if (sel_type == Selection::SameSignMuDenBoth ) return "samesignmudenboth";
+        if (sel_type == Selection::SameSignMuNum     ) return "samesignmunum";
+        throw std::invalid_argument("[tnp::GetStringFromSelection]: ERROR - invalid value!"); 
     }
 
     // passes selection based on above enum
@@ -241,6 +258,13 @@ namespace tnp
                 if (not mu_passes_id)        {return false;}
                 if (not mu_passes_ss_iso)    {return false;}
             }
+        }
+
+        // other values are invalid
+        if (lepton_type == Lepton::static_size)
+        {
+            std::cout << "lepton_type is invalid" << std::endl;
+            return false;
         }
 
         // if we got here -- it's selected

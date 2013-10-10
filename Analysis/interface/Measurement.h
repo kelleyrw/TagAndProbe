@@ -100,8 +100,11 @@ namespace tnp
     // get the selection from a string
     Selection::value_type GetSelectionFromString(const std::string& sel_name);
 
+    // get the string from the Selection 
+    std::string GetStringFromSelection(const Selection::value_type sel_type);
+
     // passes selection based on above enum
-    bool PassesSelection(const Lepton::value_type lepton, const Selection::value_type selection, const bool is_data);
+    bool PassesSelection(const Lepton::value_type lepton_type, const Selection::value_type selection, const bool is_data);
 
 } // namespace tnp
 

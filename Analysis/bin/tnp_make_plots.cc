@@ -105,6 +105,7 @@ class MassPlotLooper
             const std::vector<double> phi_bins,
             const std::vector<double> nvtx_bins,
             const bool is_data,
+            const std::string suffix,
             const bool verbose
         ); 
 
@@ -133,8 +134,9 @@ class MassPlotLooper
         std::vector<double> m_eta_bins;
         std::vector<double> m_phi_bins;
         std::vector<double> m_nvtx_bins;
-        TH1D* h_pu;
         bool m_is_data;
+        TH1D* h_pileup;
+        std::string m_suffix;
         bool m_verbose;
 
         // members
@@ -155,9 +157,11 @@ MassPlotLooper::MassPlotLooper
     const std::vector<double> phi_bins,
     const std::vector<double> nvtx_bins,
     const bool is_data,
+    const std::string suffix,
     const bool verbose
 )
     : m_output_file_name(output_file_name)
+    , m_lepton_type(lepton_type)
     , m_num(numerator)
     , m_den(denominator)
     , m_mass_low(mass_low)
@@ -168,7 +172,8 @@ MassPlotLooper::MassPlotLooper
     , m_phi_bins(phi_bins)
     , m_nvtx_bins(nvtx_bins)
     , m_is_data(is_data)
-//     , h_pileup(rt::GetHistFromRootFile<TH1D>("data/puWeights_Summer12_53x_Observed.root", "puWeights"))
+    , h_pileup(rt::GetHistFromRootFile<TH1D>("data/puWeights_Summer12_53x_Observed.root", "puWeights"))
+    , m_suffix(suffix)
     , m_verbose(verbose)
 {
 	BookHists();
@@ -182,25 +187,88 @@ void MassPlotLooper::BookHists()
     const int num_mass_bins = static_cast<int>(fabs(m_mass_high - m_mass_low)/m_mass_bin_width);
 
     // use |eta} ?
-    const bool use_abs_eta = (not m_eta_bins.empty() and m_eta_bins.front() >= 0);
-    const bool use_abs_phi = (not m_phi_bins.empty() and m_phi_bins.front() >= 0);
+    const std::string phi_title = (not m_phi_bins.empty() and m_phi_bins.front() >= 0 ? "|#phi|" : "#phi");
+    const std::string eta_title = (not m_eta_bins.empty() and m_eta_bins.front() >= 0 ? "|#eta|" : "#eta");
 
-    // book pt hists 
-    for (size_t ptbin = 0; ptbin != m_pt_bins.size()-1; ptbin++)
+    // book pt histograms 
+    if (m_pt_bins.size() >= 2)
     {
-        for (size_t etabin = 0; etabin != m_eta_bins.size()-1; etabin++)
+        for (size_t pt_bin = 0; pt_bin != m_pt_bins.size()-1; pt_bin++)
         {
-            const std::string bin_title = (use_abs_eta ? Form("%1.0f GeV < p_{T} < %1.0f GeV, %1.2f < |#eta| < %1.2f", m_pt_bins[ptbin], m_pt_bins[ptbin+1], m_eta_bins[etabin], m_eta_bins[etabin+1]) :
-                                                         Form("%1.0f GeV < p_{T} < %1.0f GeV, %1.2f < #eta < %1.2f"  , m_pt_bins[ptbin], m_pt_bins[ptbin+1], m_eta_bins[etabin], m_eta_bins[etabin+1]));
-
-            hc.Add(new TH1F(Form("h_pass_pt%lu_eta%lu", ptbin, etabin), Form("Passing probes (%s);tag & probe mass (GeV);Events / %1.1f (GeV)", bin_title.c_str(), m_mass_bin_width), num_mass_bins, m_mass_low, m_mass_high));
-            hc.Add(new TH1F(Form("h_fail_pt%lu_eta%lu", ptbin, etabin), Form("Failing probes (%s);tag & probe mass (GeV);Events / %1.1f (GeV)", bin_title.c_str(), m_mass_bin_width), num_mass_bins, m_mass_low, m_mass_high));
+            const std::string bin_title = Form("%1.0f GeV < p_{T} < %1.0f GeV", m_pt_bins[pt_bin], m_pt_bins[pt_bin+1]);
+            hc.Add(new TH1F(Form("h_pass_pt%lu", pt_bin), Form("Passing probes (%s);tag & probe mass (GeV);Events / %1.1f (GeV)", bin_title.c_str(), m_mass_bin_width), num_mass_bins, m_mass_low, m_mass_high));
+            hc.Add(new TH1F(Form("h_fail_pt%lu", pt_bin), Form("Failing probes (%s);tag & probe mass (GeV);Events / %1.1f (GeV)", bin_title.c_str(), m_mass_bin_width), num_mass_bins, m_mass_low, m_mass_high));
         }
     }
+
+    // book eta histograms
+    if (m_eta_bins.size() >= 2)
+    {
+        for (size_t eta_bin = 0; eta_bin != m_eta_bins.size()-1; eta_bin++)
+        {
+            const std::string bin_title = Form("%1.2f < %s < %1.2f", m_eta_bins[eta_bin], eta_title.c_str(), m_eta_bins[eta_bin+1]);
+            hc.Add(new TH1F(Form("h_pass_eta%lu", eta_bin), Form("Passing probes (%s);tag & probe mass (GeV);Events / %1.1f (GeV)", bin_title.c_str(), m_mass_bin_width), num_mass_bins, m_mass_low, m_mass_high));
+            hc.Add(new TH1F(Form("h_fail_eta%lu", eta_bin), Form("Failing probes (%s);tag & probe mass (GeV);Events / %1.1f (GeV)", bin_title.c_str(), m_mass_bin_width), num_mass_bins, m_mass_low, m_mass_high));
+        }
+    }
+
+    // book phi histogram
+    if (m_phi_bins.size() >= 2)
+    {
+        for (size_t phi_bin = 0; phi_bin != m_phi_bins.size()-1; phi_bin++)
+        {
+            const std::string bin_title = Form("%1.2f < %s < %1.2f", m_phi_bins[phi_bin], phi_title.c_str(), m_phi_bins[phi_bin+1]);
+            hc.Add(new TH1F(Form("h_pass_phi%lu", phi_bin), Form("Passing probes (%s);tag & probe mass (GeV);Events / %1.1f (GeV)", bin_title.c_str(), m_mass_bin_width), num_mass_bins, m_mass_low, m_mass_high));
+            hc.Add(new TH1F(Form("h_fail_phi%lu", phi_bin), Form("Failing probes (%s);tag & probe mass (GeV);Events / %1.1f (GeV)", bin_title.c_str(), m_mass_bin_width), num_mass_bins, m_mass_low, m_mass_high));
+        }
+    }
+
+    // book # vertices histogram
+    if (m_nvtx_bins.size() >= 2)
+    {
+        for (size_t nvtx_bin = 0; nvtx_bin != m_nvtx_bins.size()-1; nvtx_bin++)
+        {
+            const std::string bin_title = Form("%1.0f < # Vertices < %1.0f", m_nvtx_bins[nvtx_bin], m_nvtx_bins[nvtx_bin+1]);
+            hc.Add(new TH1F(Form("h_pass_nvtx%lu", nvtx_bin), Form("Passing probes (%s);tag & probe mass (GeV);Events / %1.1f (GeV)", bin_title.c_str(), m_mass_bin_width), num_mass_bins, m_mass_low, m_mass_high));
+            hc.Add(new TH1F(Form("h_fail_nvtx%lu", nvtx_bin), Form("Failing probes (%s);tag & probe mass (GeV);Events / %1.1f (GeV)", bin_title.c_str(), m_mass_bin_width), num_mass_bins, m_mass_low, m_mass_high));
+        }
+    }
+
+    // book pt vs eta histograms 
+    if (m_pt_bins.size() >= 2 and m_eta_bins.size() >= 2)
+    {
+        for (size_t pt_bin = 0; pt_bin != m_pt_bins.size()-1; pt_bin++)
+        {
+            for (size_t eta_bin = 0; eta_bin != m_eta_bins.size()-1; eta_bin++)
+            {
+                const std::string bin_title = Form("%1.0f GeV < p_{T} < %1.0f GeV, %1.2f < %s < %1.2f", m_pt_bins[pt_bin], m_pt_bins[pt_bin+1], m_eta_bins[eta_bin], eta_title.c_str(), m_eta_bins[eta_bin+1]);
+                hc.Add(new TH1F(Form("h_pass_pt%lu_eta%lu", pt_bin, eta_bin), Form("Passing probes (%s);tag & probe mass (GeV);Events / %1.1f (GeV)", bin_title.c_str(), m_mass_bin_width), num_mass_bins, m_mass_low, m_mass_high));
+                hc.Add(new TH1F(Form("h_fail_pt%lu_eta%lu", pt_bin, eta_bin), Form("Failing probes (%s);tag & probe mass (GeV);Events / %1.1f (GeV)", bin_title.c_str(), m_mass_bin_width), num_mass_bins, m_mass_low, m_mass_high));
+            }
+        }
+    }
+
+    // book eta vs phi histograms 
+    if (m_eta_bins.size() >= 2 and m_phi_bins.size() >= 2)
+    {
+        for (size_t eta_bin = 0; eta_bin != m_eta_bins.size()-1; eta_bin++)
+        {
+            for (size_t phi_bin = 0; phi_bin != m_phi_bins.size()-1; phi_bin++)
+            {
+                const std::string bin_title = Form("%1.2f < %s < %1.2f, %1.2f < %s < %1.2f", m_eta_bins[eta_bin], eta_title.c_str(), m_eta_bins[eta_bin+1], m_phi_bins[phi_bin], phi_title.c_str(), m_phi_bins[phi_bin+1]);
+                hc.Add(new TH1F(Form("h_pass_eta%lu_phi%lu", eta_bin, phi_bin), Form("Passing probes (%s);tag & probe mass (GeV);Events / %1.1f (GeV)", bin_title.c_str(), m_mass_bin_width), num_mass_bins, m_mass_low, m_mass_high));
+                hc.Add(new TH1F(Form("h_fail_eta%lu_phi%lu", eta_bin, phi_bin), Form("Failing probes (%s);tag & probe mass (GeV);Events / %1.1f (GeV)", bin_title.c_str(), m_mass_bin_width), num_mass_bins, m_mass_low, m_mass_high));
+            }
+        }
+    }
+
+    // TDRStyle
+    rt::SetStyle();
 
     // sumw2
     hc.SetMarkerStyle(20);
     hc.SetMarkerSize(1.0);
+    hc.SetLineWidth(1.0);
     hc.Sumw2();
 }
 
@@ -231,102 +299,141 @@ int MassPlotLooper::Analyze(long long entry)
             return 0;
         }
 
-       unsigned int evt_sel = eventSelection();
-       // Z/onia --> ee
-       if (is_el)
-       {
-           if (((evt_sel & tnp::EventSelection::ZeeTagAndProbe   ) != tnp::EventSelection::ZeeTagAndProbe   ) && 
-               ((evt_sel & tnp::EventSelection::OniaEETagAndProbe) != tnp::EventSelection::OniaEETagAndProbe))
-           {
-               if (m_verbose) {cout << "Did not pass Z/onia --> ee" << endl;}
-               return 0;
-           }
-       }
-       // Z/onia --> mm
-       if (is_mu)
-       {
-           if (((evt_sel & tnp::EventSelection::ZmmTagAndProbe     ) != tnp::EventSelection::ZmmTagAndProbe     ) && 
-               ((evt_sel & tnp::EventSelection::OniaMuMuTagAndProbe) != tnp::EventSelection::OniaMuMuTagAndProbe))
-           {
-               if (m_verbose) {cout << "Did not pass Z/onia --> mm" << endl;}
-               return 0;
-           }
-       }
-   
-       // require OS leptons
-       if((qProbe() * qTag()) > 0)
-       {
-           if (m_verbose) {cout << "Did not pass OS requirement" << endl;}
-           return 0;
-       }
+        unsigned int evt_sel = eventSelection();
+        // Z/onia --> ee
+        if (is_el)
+        {
+            if (((evt_sel & tnp::EventSelection::ZeeTagAndProbe   ) != tnp::EventSelection::ZeeTagAndProbe   ) && 
+                ((evt_sel & tnp::EventSelection::OniaEETagAndProbe) != tnp::EventSelection::OniaEETagAndProbe))
+            {
+                if (m_verbose) {cout << "Did not pass Z/onia --> ee" << endl;}
+                return 0;
+            }
+        }
+        // Z/onia --> mm
+        if (is_mu)
+        {
+            if (((evt_sel & tnp::EventSelection::ZmmTagAndProbe     ) != tnp::EventSelection::ZmmTagAndProbe     ) && 
+                ((evt_sel & tnp::EventSelection::OniaMuMuTagAndProbe) != tnp::EventSelection::OniaMuMuTagAndProbe))
+            {
+                if (m_verbose) {cout << "Did not pass Z/onia --> mm" << endl;}
+                return 0;
+            }
+        }
 
-       // require mass window around the Z
-       const float mass = tagAndProbeMass();
-       if (not (m_mass_low < mass && mass < m_mass_high))
-       {
-           if (m_verbose) {cout << "Did not pass Z mass requirement" << endl;}
-           return 0;
-       }
+        // require OS leptons
+        if((qProbe() * qTag()) > 0)
+        {
+            if (m_verbose) {cout << "Did not pass OS requirement" << endl;}
+            return 0;
+        }
 
-       // MC reqruied DeltaR(reco lepton, status 1 gen level lepton) < 0.2
-       if (is_mc && gen_drs1() > 0.2)
-       {
-           if (m_verbose) {cout << "Did not DeltaR(lep, s1) < 0.2 requirement" << endl;}
-           return 0;
-       }
+        // require mass window around the Z
+        const float mass = tagAndProbeMass();
+        if (not (m_mass_low < mass && mass < m_mass_high))
+        {
+            if (m_verbose) {cout << "Did not pass Z mass requirement" << endl;}
+            return 0;
+        }
 
-       // check pt boundaries
-       const float probe_pt = probe().pt();
-       const float pt_min   = (m_pt_bins.empty() ? 999999.0 : m_pt_bins.front());
-       const float pt_max   = (m_pt_bins.empty() ? 999999.0 : m_pt_bins.back() );
-       if (not (pt_min < probe_pt && probe_pt < pt_max))
-       {
-           if (m_verbose) {cout << "outside pt bins" << endl;}
-           return 0;
-       }
+        // MC reqruied DeltaR(reco lepton, status 1 gen level lepton) < 0.2
+        if (is_mc && gen_drs1() > 0.2)
+        {
+            if (m_verbose) {cout << "Did not DeltaR(lep, s1) < 0.2 requirement" << endl;}
+            return 0;
+        }
 
-       // check eta boundaries
-       const float probe_eta = fabs(is_el ? sceta() : probe().eta());
-       const float eta_min   = (m_eta_bins.empty() ? 999999.0 : m_eta_bins.front());
-       const float eta_max   = (m_eta_bins.empty() ? 999999.0 : m_eta_bins.back() );
-       if (not (eta_min < probe_eta && probe_eta < eta_max))
-       {
-           if (m_verbose) {cout << "outside eta bins" << endl;}
-           return 0;
-       }
+        // check pt boundaries
+        const bool has_pt_bins = m_pt_bins.size() >= 2;
+        const float probe_pt   = probe().pt();
+        const float pt_min     = (m_pt_bins.empty() ? 999999.0 : m_pt_bins.front());
+        const float pt_max     = (m_pt_bins.empty() ? 999999.0 : m_pt_bins.back() );
+        if (has_pt_bins and not (pt_min < probe_pt && probe_pt < pt_max))
+        {
+            if (m_verbose) {cout << "outside pt bins" << endl;}
+            return 0;
+        }
 
-       // find pT/eta bin
-       unsigned int pt_bin  = rt::find_bin(probe_pt , m_pt_bins );
-       unsigned int eta_bin = rt::find_bin(probe_eta, m_eta_bins);
-       const std::string h_pass_histname = Form("h_pass_pt%u_eta%u", pt_bin, eta_bin);
-       const std::string h_fail_histname = Form("h_fail_pt%u_eta%u", pt_bin, eta_bin);
+        // check eta boundaries
+        const bool has_eta_bins = m_eta_bins.size() >= 2;
+        const float probe_eta   = fabs(is_el ? sceta() : probe().eta());
+        const float eta_min     = (m_eta_bins.empty() ? 999999.0 : m_eta_bins.front());
+        const float eta_max     = (m_eta_bins.empty() ? 999999.0 : m_eta_bins.back() );
+        if (has_eta_bins and not (eta_min < probe_eta && probe_eta < eta_max))
+        {
+            if (m_verbose) {cout << "outside eta bins" << endl;}
+            return 0;
+        }
 
-       if (m_verbose) {cout << Form("pt %f, ptbin %u"  , probe_pt , pt_bin ) << endl;}
-       if (m_verbose) {cout << Form("eta %f, etabin %u", probe_eta, eta_bin) << endl;}
+        // check phi boundaries
+        const bool has_phi_bins = m_phi_bins.size() >= 2;
+        const float probe_phi   = probe().phi();
+        const float phi_min     = (m_phi_bins.empty() ? 999999.0 : m_phi_bins.front());
+        const float phi_max     = (m_phi_bins.empty() ? 999999.0 : m_phi_bins.back() );
+        if (has_phi_bins and not (phi_min < probe_phi && probe_phi < phi_max))
+        {
+            if (m_verbose) {cout << "outside phi bins" << endl;}
+            return 0;
+        }
 
-       const float nvtxs  = nvtx();
-       const float weight = 1.0;
-//        const float weight = (is_mc ? (scale1fb() * h_pu->GetBinContent(nvtxs+1)) : 1.0);
+        // check the nvtxs boundaries
+        const bool has_nvtx_bins = m_nvtx_bins.size() >= 2;
+        const float nvtxs        = nvtx();
+        const float nvtx_min     = (m_nvtx_bins.empty() ? 999999.0 : m_nvtx_bins.front());
+        const float nvtx_max     = (m_nvtx_bins.empty() ? 999999.0 : m_nvtx_bins.back() );
+        if (has_nvtx_bins and not (nvtx_min < nvtxs && nvtxs < nvtx_max))
+        {
+            if (m_verbose) {cout << "outside nvtx bins" << endl;}
+            return 0;
+        }
 
-       // passes the probe numerator 
-       if (tnp::PassesSelection(m_lepton_type, m_num, is_data))
-       {
-           if (m_verbose) {cout << "passes the numerator selection" << endl;}
+        // find pt,eta,phi,nvtx bin
+        unsigned int pt_bin   = (has_pt_bins   ? rt::find_bin(probe_pt , m_pt_bins  ) : -999999);
+        unsigned int eta_bin  = (has_eta_bins  ? rt::find_bin(probe_eta, m_eta_bins ) : -999999);
+        unsigned int phi_bin  = (has_phi_bins  ? rt::find_bin(probe_phi, m_phi_bins ) : -999999);
+        unsigned int nvtx_bin = (has_nvtx_bins ? rt::find_bin(nvtxs    , m_nvtx_bins) : -999999);
 
-           // fill hists
-           hc[h_pass_histname]->Fill(mass, weight);
-       }
-       // fails the probe numerator 
-       else
-       {
-           if (m_verbose) {cout << "fails the numerator selection" << endl;}
-           
-           // fill hists
-           hc[h_fail_histname]->Fill(mass, weight);
-       }
+        if (m_verbose and has_pt_bins  ) {cout << Form("pt %f  , pt_bin %u"  , probe_pt , pt_bin  ) << endl;}
+        if (m_verbose and has_eta_bins ) {cout << Form("eta %f , eta_bin %u" , probe_eta, eta_bin ) << endl;}
+        if (m_verbose and has_phi_bins ) {cout << Form("phi %f , phi %u"     , probe_phi, phi_bin ) << endl;}
+        if (m_verbose and has_nvtx_bins) {cout << Form("nvtx %f, nvtx_bin %u", nvtxs    , nvtx_bin) << endl;}
 
-       // done
-       return 0;
+        // PU re-weight
+        //const float weight = 1.0;
+        const float weight = (is_mc ? (scale1fb() * h_pileup->GetBinContent(nvtxs+1)) : 1.0);
+
+        // Fill the histograms
+        // ------------------------------------------------------------------------------------ //
+
+        // passes the probe numerator 
+        if (tnp::PassesSelection(m_lepton_type, m_num, is_data))
+        {
+            if (m_verbose) {cout << "passes the numerator selection" << endl;}
+
+            // fill hists
+            if (has_pt_bins                  ) {hc[Form("h_pass_pt%u", pt_bin)                 ]->Fill(mass, weight);}
+            if (has_eta_bins                 ) {hc[Form("h_pass_eta%u", eta_bin)               ]->Fill(mass, weight);}
+            if (has_phi_bins                 ) {hc[Form("h_pass_phi%u", phi_bin)               ]->Fill(mass, weight);}
+            if (has_nvtx_bins                ) {hc[Form("h_pass_nvtx%u", nvtx_bin)             ]->Fill(mass, weight);}
+            if (has_pt_bins and has_eta_bins ) {hc[Form("h_pass_pt%u_eta%u", pt_bin, eta_bin)  ]->Fill(mass, weight);}
+            if (has_eta_bins and has_phi_bins) {hc[Form("h_pass_eta%u_phi%u", eta_bin, phi_bin)]->Fill(mass, weight);}
+        }
+        // fails the probe numerator 
+        else
+        {
+            if (m_verbose) {cout << "fails the numerator selection" << endl;}
+
+            // fill hists
+            if (has_pt_bins                  ) {hc[Form("h_fail_pt%u", pt_bin)                 ]->Fill(mass, weight);}
+            if (has_eta_bins                 ) {hc[Form("h_fail_eta%u", eta_bin)               ]->Fill(mass, weight);}
+            if (has_phi_bins                 ) {hc[Form("h_fail_phi%u", phi_bin)               ]->Fill(mass, weight);}
+            if (has_nvtx_bins                ) {hc[Form("h_fail_nvtx%u", nvtx_bin)             ]->Fill(mass, weight);}
+            if (has_pt_bins and has_eta_bins ) {hc[Form("h_fail_pt%u_eta%u", pt_bin, eta_bin)  ]->Fill(mass, weight);}
+            if (has_eta_bins and has_phi_bins) {hc[Form("h_fail_eta%u_phi%u", eta_bin, phi_bin)]->Fill(mass, weight);}
+        }
+
+        // done
+        return 0;
     }
     catch (std::exception& e)
     {
@@ -345,11 +452,12 @@ void MassPlotLooper::EndJob()
     // write output
     cout << "Writing histogram root file to: " << m_output_file_name << endl;
     m_hist_container.Write(m_output_file_name);
-//     if (m_print)
-//     {
-//         std::string output_print_path = rt::dirname(m_root_file->GetName()) + "/" + m_suffix;
-//         m_hist_container.Print(output_print_path, m_suffix);
-//     }
+    if (not m_suffix.empty())
+    {
+        std::string output_print_path = lt::string_replace_all(m_output_file_name, ".root", "") + "/" + m_suffix;
+        cout << "Printing histograms to: " << output_print_path  << endl;
+        m_hist_container.Print(output_print_path, m_suffix);
+    }
 }
 
 // wrapper to call multiple loopers on each event 
@@ -541,13 +649,14 @@ int ScanChain
                 }
 
                 // check for dupiclate run and events
-                DorkyEventIdentifier id = {run, evt, ls};
-                if (is_duplicate(id))
-                {
-                    if (verbose) {cout << "[ScanChain] good run file = " << run_list << endl;}
-                    duplicates++;
-                    continue;
-                }
+                // Turned off since this doesn't work since there are multple lepton pairs per event...
+                //DorkyEventIdentifier id = {run, evt, ls};
+                //if (is_duplicate(id))
+                //{
+                //    if (verbose) {cout << "[ScanChain] good run file = " << run_list << endl;}
+                //    duplicates++;
+                //    continue;
+                //}
             }
 
             // print run/ls/event
@@ -639,15 +748,14 @@ try
         const double mass_high                    = tnp_cfg.getParameter<double>("mass_high");
         const double mass_bin_width               = tnp_cfg.getParameter<double>("mass_bin_width");
         const bool verbose                        = tnp_cfg.getParameter<bool>("verbose");
+        const std::string suffix                  = tnp_cfg.getParameter<std::string>("suffix");
         const std::string analysis_path           = lt::getenv("CMSSW_BASE") + "/src/TagAndProbe/Analysis";
         const std::string output_label            = tnp_cfg.getParameter<string>("output_label");
         const std::vector<double> pt_bins         = tnp_cfg.getParameter<std::vector<double> >("pt_bins");
         const std::vector<double> eta_bins        = tnp_cfg.getParameter<std::vector<double> >("eta_bins");
         const std::vector<double> phi_bins        = tnp_cfg.getParameter<std::vector<double> >("phi_bins");
         const std::vector<double> nvtx_bins       = tnp_cfg.getParameter<std::vector<double> >("nvtx_bins");
-
-
-        const std::vector<Dataset> datasets = GetDatasetsFromVPSet(tnp_cfg.getParameter<std::vector<edm::ParameterSet> >("datasets"));
+        const std::vector<Dataset> datasets       = GetDatasetsFromVPSet(tnp_cfg.getParameter<std::vector<edm::ParameterSet> >("datasets"));
 
         // for each dataset makes the set of histograms
         // -------------------------------------------------------------------------------------------------//
@@ -704,6 +812,7 @@ try
                      phi_bins,
                      nvtx_bins,
                      dataset.m_is_data,
+                     suffix,
                      verbose
                 ); 
                 tnp_loopers.push_back(tnp_looper);

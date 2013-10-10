@@ -73,7 +73,8 @@ datasets_mu = cms.VPSet(dy_full, single_mu)  # muons
 datasets_el = cms.VPSet(dy_full, single_el)  # electrons
 
 ## maximum number of events to run on
-max_events = cms.int64(1000)
+# max_events = cms.int64(1000)
+max_events = cms.int64(-1)
 
 ## verbose print out for troubleshooting 
 # verbose = cms.bool(True)
@@ -89,7 +90,12 @@ pileup_hist_file = cms.string("")
 pileup_hist_name = cms.string("")
 
 ## output label to give it a unique name
-output_label = cms.string("ss2012_small")
+output_label = cms.string("ss2012_test")
+
+## suffix to print the plots (before the fit)
+## blank means do not print
+## available options are: eps, png, pdf
+suffix = cms.string("png")
  
 ## muons
 ## ------------------------------------------ #
@@ -99,6 +105,11 @@ ss2012_mu = cms.PSet(
 
 	## output label to give it a unique name
 	output_label = output_label,
+ 
+	## suffix to print the plots (before the fit)
+	## blank means do not print
+	## available options are: eps, png, pdf
+	suffix = suffix, 
  
 	## max number of events to run on
 	max_events = max_events,
@@ -136,6 +147,11 @@ egamma_el = cms.PSet(
 
 	## output label to give it a unique name
 	output_label = output_label,
+ 
+	## suffix to print the plots (before the fit)
+	## blank means do not print
+	## available options are: eps, png, pdf
+	suffix = suffix, 
  
 	## max number of events to run on
 	max_events = max_events,
