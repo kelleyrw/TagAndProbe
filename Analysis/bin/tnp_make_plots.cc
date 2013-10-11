@@ -712,7 +712,7 @@ try
     // parse the inputs
     // -------------------------------------------------------------------------------------------------//
 
-    gSystem->Load( "libFWCoreFWLite" );
+    gSystem->Load("libFWCoreFWLite");
     AutoLibraryLoader::enable();
 
     // check that the python is passed
@@ -721,7 +721,7 @@ try
         throw std::invalid_argument(Form("Usage : %s [parameters.py]", argv[0]));
     }
 
-    // check that 
+    // check that pset contains "process" 
     const std::string pset_filename = argv[1];
     if (!edm::readPSetsFrom(argv[1])->existsAs<edm::ParameterSet>("process"))
     {

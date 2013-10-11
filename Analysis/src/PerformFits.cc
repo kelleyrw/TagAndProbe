@@ -610,23 +610,23 @@ namespace tnp
 
     Model::value_type GetModelFromString(const std::string& model_name)
     {
-        if(lt::string_lower(model_name) == "BreitWignerCB") {return Model::BreitWignerCB;}
-        if(lt::string_lower(model_name) == "MCTemplate"   ) {return Model::MCTemplate;   }
-        if(lt::string_lower(model_name) == "Exponential"  ) {return Model::Exponential;  }
-        if(lt::string_lower(model_name) == "Argus"        ) {return Model::Argus;        }
-        if(lt::string_lower(model_name) == "ErfExp"       ) {return Model::ErfExp;       }
-        if(lt::string_lower(model_name) == "Chebychev"    ) {return Model::Chebychev;    }
-        if(lt::string_lower(model_name) == "ChebyExp"     ) {return Model::ChebyExp;     }
-        if(lt::string_lower(model_name) == "Linear"       ) {return Model::Linear;       }
-        if(lt::string_lower(model_name) == "Poly2"        ) {return Model::Poly2;        }
-        if(lt::string_lower(model_name) == "Poly3"        ) {return Model::Poly3;        }
-        if(lt::string_lower(model_name) == "Poly6"        ) {return Model::Poly6;        }
-        if(lt::string_lower(model_name) == "Poly8"        ) {return Model::Poly8;        }
-        if(lt::string_lower(model_name) == "LinearExp"    ) {return Model::LinearExp;    }
-        if(lt::string_lower(model_name) == "Poly2Exp"     ) {return Model::Poly2Exp;     }
-        if(lt::string_lower(model_name) == "Poly3Exp"     ) {return Model::Poly3Exp;     }
-        if(lt::string_lower(model_name) == "Poly4Exp"     ) {return Model::Poly4Exp;     }
-        if(lt::string_lower(model_name) == "Poly8Exp"     ) {return Model::Poly8Exp;     }
+        if(lt::string_lower(model_name) == "breitwignercb") {return Model::BreitWignerCB;}
+        if(lt::string_lower(model_name) == "mctemplate"   ) {return Model::MCTemplate;   }
+        if(lt::string_lower(model_name) == "exponential"  ) {return Model::Exponential;  }
+        if(lt::string_lower(model_name) == "argus"        ) {return Model::Argus;        }
+        if(lt::string_lower(model_name) == "erfexp"       ) {return Model::ErfExp;       }
+        if(lt::string_lower(model_name) == "chebychev"    ) {return Model::Chebychev;    }
+        if(lt::string_lower(model_name) == "chebyexp"     ) {return Model::ChebyExp;     }
+        if(lt::string_lower(model_name) == "linear"       ) {return Model::Linear;       }
+        if(lt::string_lower(model_name) == "poly2"        ) {return Model::Poly2;        }
+        if(lt::string_lower(model_name) == "poly3"        ) {return Model::Poly3;        }
+        if(lt::string_lower(model_name) == "poly6"        ) {return Model::Poly6;        }
+        if(lt::string_lower(model_name) == "poly8"        ) {return Model::Poly8;        }
+        if(lt::string_lower(model_name) == "linearexp"    ) {return Model::LinearExp;    }
+        if(lt::string_lower(model_name) == "poly2exp"     ) {return Model::Poly2Exp;     }
+        if(lt::string_lower(model_name) == "poly3exp"     ) {return Model::Poly3Exp;     }
+        if(lt::string_lower(model_name) == "poly4exp"     ) {return Model::Poly4Exp;     }
+        if(lt::string_lower(model_name) == "poly8exp"     ) {return Model::Poly8Exp;     }
 
         // if here, didn't find a match
         throw std::invalid_argument(Form("[tnp::GetModelFromString] Error: model %s not found", model_name.c_str()));

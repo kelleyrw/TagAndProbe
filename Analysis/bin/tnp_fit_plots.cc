@@ -134,7 +134,7 @@ try
         throw std::invalid_argument(Form("Usage : %s [parameters.py]", argv[0]));
     }
 
-    // check that 
+    // check that pset contains "process" 
     const std::string pset_filename = argv[1];
     if (!edm::readPSetsFrom(argv[1])->existsAs<edm::ParameterSet>("process"))
     {
@@ -149,75 +149,18 @@ try
     const std::vector<double> eta_bins  = tnp_cfg.getParameter<std::vector<double> >("eta_bins");
     const std::vector<double> phi_bins  = tnp_cfg.getParameter<std::vector<double> >("phi_bins");
     const std::vector<double> nvtx_bins = tnp_cfg.getParameter<std::vector<double> >("nvtx_bins");
-    const unsigned int npt_bins         = pt_bins.size()-1;
-    const unsigned int neta_bins        = eta_bins.size()-1;
-    const unsigned int nphi_bins        = phi_bins.size()-1;
-    const unsigned int nnvtx_bins       = nvtx_bins.size()-1;
+    const unsigned int num_pt_bins      = pt_bins.size()-1;
+    const unsigned int num_eta_bins     = eta_bins.size()-1;
+    const unsigned int num_phi_bins     = phi_bins.size()-1;
+    const unsigned int num_nvtx_bins    = nvtx_bins.size()-1;
 
-    // get the bin models pt vs eta
-    const std::vector<std::string> pt_vs_eta_model_strings = tnp_cfg.getParameter<std::vector<std::string> >("pt_vs_eta_models");
-    const std::vector<std::string> pt_model_strings        = tnp_cfg.getParameter<std::vector<std::string> >("pt_models");
-    if ((npt_bins)*(neta_bins)*num_categories != pt_vs_eta_model_strings.size())
-    {
-        throw invalid_argument("[tnp_fit_plots] Error: pt vs eta bins do not line up with pt and eta models in configuation");
-    }
-
-    cout << "num strings = " << pt_vs_eta_model_strings.size() << endl;
-//     cout << "index\t" << "pt_bin" << "\t" << "eta_bin" << "\t" << "model_bin" << " = " << "pt_vs_eta_model_strings.at(i)" << endl;
-    for (size_t pt_bin = 0; pt_bin != npt_bins; pt_bin++)
-    {
-        for (size_t eta_bin = 0; eta_bin != neta_bins; eta_bin++)
-        {
-            for (size_t model_bin = 0; model_bin != num_categories; model_bin++)
-            {
-                int index = pt_bin*(neta_bins * num_categories) + eta_bin*(num_categories) + model_bin;
-//                 cout << index << "\t" <<  pt_bin << "\t" << eta_bin << "\t" << model_bin << " = " << pt_vs_eta_model_strings.at(index) << endl;
-            }
-        }
-    }
-
-//     typedef Array3D::index index;
-    ModelArray3D A(boost::extents[npt_bins][neta_bins][num_categories]);
-
-    for (size_t pt_bin = 0; pt_bin != npt_bins; pt_bin++)
-    {
-        for (size_t eta_bin = 0; eta_bin != neta_bins; eta_bin++)
-        {
-            for (size_t model_bin = 0; model_bin != num_categories; model_bin++)
-            {
-
-                int index = pt_bin*(neta_bins * num_categories) + eta_bin*(num_categories) + model_bin;
-                A[pt_bin][eta_bin][model_bin] = tnp::GetModelFromString(pt_vs_eta_model_strings.at(index));
-//                 cout << index << "\t" <<  pt_bin << "\t" << eta_bin << "\t" << model_bin << " = " << pt_vs_eta_model_strings.at(index) << endl;
-            }
-        }
-    }
-
-    ModelArray3D pt_vs_eta_models = GetModelArrayFromVString(pt_vs_eta_model_strings, pt_bins, eta_bins);
-    for (size_t pt_bin = 0; pt_bin != npt_bins; pt_bin++)
-    {
-        for (size_t eta_bin = 0; eta_bin != neta_bins; eta_bin++)
-        {
-            for (size_t model_bin = 0; model_bin != num_categories; model_bin++)
-            {
-
-                int index = pt_bin*(neta_bins * num_categories) + eta_bin*(num_categories) + model_bin;
-                tnp::Model::value_type model = pt_vs_eta_models[pt_bin][eta_bin][model_bin];
-                cout << index << "\t" <<  pt_bin << "\t" << eta_bin << "\t" << model_bin << " = " << pt_vs_eta_model_strings.at(index) << "\t" << GetStringFromModel(model) << endl;
-            }
-        }
-    }
-    ModelArray2D pt_models = GetModelArrayFromVString(pt_model_strings, pt_bins);
-    for (size_t pt_bin = 0; pt_bin != npt_bins; pt_bin++)
-    {
-        for (size_t model_bin = 0; model_bin != num_categories; model_bin++)
-        {
-
-            int index = pt_bin*(num_categories) + model_bin;
-            tnp::Model::value_type model = pt_models[pt_bin][model_bin];
-            cout << index << "\t" <<  pt_bin << "\t" << model_bin << " = " << pt_model_strings.at(index) << "\t" << GetStringFromModel(model) << endl;
-        }
-    }
+    // get the models (per bin)
+    ModelArray2D pt_models         = GetModelArrayFromVString(tnp_cfg.getParameter<std::vector<std::string> >("pt_models"        ), pt_bins           ); 
+    ModelArray2D eta_models        = GetModelArrayFromVString(tnp_cfg.getParameter<std::vector<std::string> >("eta_models"       ), eta_bins          ); 
+    ModelArray2D phi_models        = GetModelArrayFromVString(tnp_cfg.getParameter<std::vector<std::string> >("phi_models"       ), phi_bins          ); 
+    ModelArray2D nvtx_models       = GetModelArrayFromVString(tnp_cfg.getParameter<std::vector<std::string> >("nvtx_models"      ), nvtx_bins         ); 
+    ModelArray3D pt_vs_eta_models  = GetModelArrayFromVString(tnp_cfg.getParameter<std::vector<std::string> >("pt_vs_eta_models" ), pt_bins, eta_bins ); 
+    ModelArray3D eta_vs_phi_models = GetModelArrayFromVString(tnp_cfg.getParameter<std::vector<std::string> >("eta_vs_phi_models"), eta_bins, phi_bins); 
 
     // done
     return 0;
