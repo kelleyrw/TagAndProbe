@@ -1,8 +1,14 @@
 import FWCore.ParameterSet.Config as cms
 import os
-import sys
-sys.path.append(os.getenv("CMSSW_BASE") + "/src/TagAndProbe/Analysis/config")
 
+## path the analysis
+analysis_path = os.getenv("CMSSW_BASE") + "/src/TagAndProbe/Analysis"
+
+## add the configuration path (if not already there) 
+import sys
+sys.path.append(analysis_path + "/config")
+
+## process to parse
 process = cms.PSet()
 
 ## ------------------------------------------------------------------------------------------------------------------- #

@@ -1,6 +1,13 @@
 import FWCore.ParameterSet.Config as cms
 import os
 
+## path the analysis
+analysis_path = os.getenv("CMSSW_BASE") + "/src/TagAndProbe/Analysis"
+
+## add the configuration path
+import sys
+sys.path.append(analysis_path + "/config")
+
 ## ------------------------------------------------------------------------------------------------------------------- #
 ## define the input datasets
 ## ------------------------------------------------------------------------------------------------------------------- #
@@ -9,7 +16,7 @@ import os
 lepton_tree_path = "/Users/rwk7t/Data/babies/leptonTrees/tnp_V00-00-00"
 
 ## good run list
-run_list = cms.string(os.getenv("CMSSW_BASE") + "/src/TagAndProbe/Analysis/json/final_19p49fb.txt")
+run_list = cms.string(analysis_path + "/json/final_19p49fb.txt")
 
 ## DY fullsim
 dy_full = cms.PSet(
