@@ -36,12 +36,17 @@ tnp_parameters = cms.PSet(
 	## blank means do not print
 	## available options are: eps, png, pdf
 	suffix = cms.string("png"), 
+
+	## pile re-weighting histogram
+	pileup_hist_file = cms.string(analysis_path + "/data/puWeights_Summer12_53x_Observed.root"),
+	pileup_hist_name = cms.string("puWeights"),
  
 	## max number of events to run on
 	max_events = cms.int64(-1),
 
 	## verbosity (for trouble shooting)
-	verbose = cms.bool(True),
+# 	verbose = cms.bool(True),
+	verbose = cms.bool(False),
 
 	## mass range for resonance window
 	mass_low       = cms.double(60.0),  # GeV
@@ -78,7 +83,7 @@ tnp_parameters = cms.PSet(
 		"BreitWignerCB", "BreitWignerCB", "Exponential", "Exponential", # pt0
 		"BreitWignerCB", "BreitWignerCB", "Exponential", "Exponential", # pt1
 		"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "Exponential", # pt2
-		"MCTemplate"   , "MCTemplate"   , "Exponential", "Chebychev"  , # pt3
+		"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "Chebychev"  , # pt3
 		"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # pt4
 		"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # pt5
 	),

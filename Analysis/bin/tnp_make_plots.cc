@@ -106,6 +106,8 @@ class MassPlotLooper
             const std::vector<double> phi_bins,
             const std::vector<double> nvtx_bins,
             const bool is_data,
+            const std::string& pileup_hist_file, 
+            const std::string& pileup_hist_name, 
             const std::string suffix,
             const bool verbose
         ); 
@@ -138,9 +140,9 @@ class MassPlotLooper
         std::vector<double> m_phi_bins;
         std::vector<double> m_nvtx_bins;
         bool m_is_data;
-        TH1D* h_pileup;
         std::string m_suffix;
         bool m_verbose;
+        TH1D* h_pileup;
 
         // members
         rt::TH1Container m_hist_container;
@@ -160,6 +162,8 @@ MassPlotLooper::MassPlotLooper
     const std::vector<double> phi_bins,
     const std::vector<double> nvtx_bins,
     const bool is_data,
+    const std::string& pileup_hist_file, 
+    const std::string& pileup_hist_name, 
     const std::string suffix,
     const bool verbose
 )
@@ -175,9 +179,9 @@ MassPlotLooper::MassPlotLooper
     , m_phi_bins(phi_bins)
     , m_nvtx_bins(nvtx_bins)
     , m_is_data(is_data)
-    , h_pileup(rt::GetHistFromRootFile<TH1D>("data/puWeights_Summer12_53x_Observed.root", "puWeights"))
     , m_suffix(suffix)
     , m_verbose(verbose)
+    , h_pileup(rt::GetHistFromRootFile<TH1D>(pileup_hist_file, pileup_hist_name))
 {
 	BookHists();
 }
@@ -755,7 +759,9 @@ try
     const bool verbose                        = tnp_cfg.getParameter<bool>("verbose");
     const std::string suffix                  = tnp_cfg.getParameter<std::string>("suffix");
     const std::string analysis_path           = lt::getenv("CMSSW_BASE") + "/src/TagAndProbe/Analysis";
-    const std::string output_label            = tnp_cfg.getParameter<string>("output_label");
+    const std::string output_label            = tnp_cfg.getParameter<std::string>("output_label");
+    const std::string pileup_hist_file        = tnp_cfg.getParameter<std::string>("pileup_hist_file");
+    const std::string pileup_hist_name        = tnp_cfg.getParameter<std::string>("pileup_hist_name");
     const std::vector<double> pt_bins         = tnp_cfg.getParameter<std::vector<double> >("pt_bins");
     const std::vector<double> eta_bins        = tnp_cfg.getParameter<std::vector<double> >("eta_bins");
     const std::vector<double> phi_bins        = tnp_cfg.getParameter<std::vector<double> >("phi_bins");
@@ -815,6 +821,8 @@ try
                 phi_bins,
                 nvtx_bins,
                 dataset.m_is_data,
+                pileup_hist_file,
+                pileup_hist_name,
                 suffix,
                 verbose
             ), 
