@@ -118,6 +118,8 @@ class MassPlotLooper
         // analyze the event
         int Analyze(long long entry);
 
+        int operator()(long long entry);
+
         // end of the job tasks
         void EndJob();
 
@@ -456,8 +458,15 @@ void MassPlotLooper::EndJob()
     {
         std::string output_print_path = lt::string_replace_all(m_output_file_name, ".root", "") + "/" + m_suffix;
         cout << "Printing histograms to: " << output_print_path  << endl;
+        cout << m_hist_container["h_pass_pt3"]->GetEntries() << endl;
         m_hist_container.Print(output_print_path, m_suffix);
     }
+}
+
+// call each loopers analysis function
+int MassPlotLooper::operator()(long long entry)
+{
+    return Analyze(entry);
 }
 
 // wrapper to call multiple loopers on each event 
@@ -768,37 +777,34 @@ try
             // for each dataset makes the set of histograms
             // -------------------------------------------------------------------------------------------------//
 
-            std::vector<std::string> num_sel_strings = tnp_cfg.getParameter<std::vector<std::string> >("numerator"  );
-            std::vector<std::string> den_sel_strings = tnp_cfg.getParameter<std::vector<std::string> >("denominator");
+            // numerator and denominator    
+            const tnp::Selection::value_type num_selection = tnp::GetSelectionFromString(tnp_cfg.getParameter<std::string>("numerator"  ));
+            const tnp::Selection::value_type den_selection = tnp::GetSelectionFromString(tnp_cfg.getParameter<std::string>("denominator"));
 
-            // numerator and denominator selections should match up one-to-one
-            // and thus be the same size vectors
-            if (num_sel_strings.size() != den_sel_strings.size())
-            {
-                throw std::invalid_argument(Form("[tnp_make_plots] Error: ParametersSet value of 'numerator' and 'denominator' must be the same size"));
-            }
+            // output ROOT file name
+            // (i.e. analysis_path/plots/output_label/lepton_type/den_num/dataset.root)
+            const std::string output_file_name = Form("%s/plots/%s/%s/%s_%s/%s.root",
+                analysis_path.c_str(),
+                output_label.c_str(),
+                GetStringFromLepton(lepton_type).c_str(),
+                GetStringFromSelection(den_selection).c_str(),
+                GetStringFromSelection(num_selection).c_str(),
+                dataset.m_name.c_str()
+            );
 
-            // build a vector of loopers
-            std::vector<MassPlotLooper*> tnp_loopers;
-            for (size_t i = 0; i != num_sel_strings.size(); i++)
-            {
-                // numerator and denominator    
-                const tnp::Selection::value_type num_selection = tnp::GetSelectionFromString(num_sel_strings.at(i));
-                const tnp::Selection::value_type den_selection = tnp::GetSelectionFromString(den_sel_strings.at(i));
+            // print out the parameters for each run
+            cout << "\n[tnp_make_plots] running with the following inputs:" << endl;
+            printf("%-15s = %lld\n", "max_events"   , max_events                                   );
+            printf("%-15s = %s\n"  , "name"         , dataset.m_name.c_str()                       );
+            printf("%-15s = %s\n"  , "run_list"     , dataset.m_run_list.c_str()                   );
+            printf("%-15s = %d\n"  , "is_data"      , dataset.m_is_data                            );
+            printf("%-15s = %s\n"  , "num_selection", GetStringFromSelection(den_selection).c_str());
+            printf("%-15s = %s\n"  , "den_selection", GetStringFromSelection(num_selection).c_str());
 
-                // output ROOT file name
-                // (i.e. analysis_path/plots/output_label/lepton_type/den_num/dataset.root)
-                const std::string output_file_name = Form("%s/plots/%s/%s/%s_%s/%s.root",
-                    analysis_path.c_str(),
-                    output_label.c_str(),
-                    GetStringFromLepton(lepton_type).c_str(),
-                    den_sel_strings.at(i).c_str(),
-                    num_sel_strings.at(i).c_str(),
-                    dataset.m_name.c_str()
-                );
-
-                // analysis looper
-                MassPlotLooper* tnp_looper = new MassPlotLooper 
+            // analysis looper
+            ScanChain
+            (
+                MassPlotLooper
                 (
                      output_file_name,
                      lepton_type,
@@ -814,25 +820,10 @@ try
                      dataset.m_is_data,
                      suffix,
                      verbose
-                ); 
-                tnp_loopers.push_back(tnp_looper);
-
-            } // end loop over selections
-
-            // print out the parameters for each run
-            cout << "\n[tnp_make_plots] running with the following inputs:" << endl;
-            printf("%-15s = %lld\n", "max_events"   , max_events                              );
-            printf("%-15s = %s\n"  , "name"         , dataset.m_name.c_str()                  );
-            printf("%-15s = %s\n"  , "run_list"     , dataset.m_run_list.c_str()              );
-            printf("%-15s = %d\n"  , "is_data"      , dataset.m_is_data                       );
-            printf("%-15s = {%s}\n", "num_selection", lt::string_join(num_sel_strings).c_str());
-            printf("%-15s = {%s}\n", "den_selection", lt::string_join(den_sel_strings).c_str());
-
-            // scan the chain and actually make the plots
-            ScanChain(MultiMassPlotLooper(tnp_loopers), dataset, max_events);
-
-            // cleanup
-            lt::delete_container(tnp_loopers);
+                ), 
+                dataset,
+                max_events
+            );
 
         } // end loop over datasets 
 
