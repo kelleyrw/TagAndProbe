@@ -89,12 +89,13 @@ namespace tnp
         const Model::value_type bkg_fail_model, 
         const TH1* const h_pass, 
         const TH1* const h_fail,
-        const std::string pt_label, 
-        const std::string eta_label, 
-        const float mlow = 60.0,
-        const float mhigh = 120.0,
-        TH1F* const h_pass_template = NULL,
-        TH1F* const h_fail_template = NULL
+        const float mass_low = 60.0,
+        const float mass_high = 120.0,
+        const float mass_bin_width = 2.0,
+        const std::string a_bin_label = "", 
+        const std::string b_bin_label = "", 
+        TH1* const h_pass_template = NULL,
+        TH1* const h_fail_template = NULL
     );
 
     // Peform smple count (no background fitting/subtraction) 
@@ -102,10 +103,11 @@ namespace tnp
     (
         TH1* const h_pass, 
         TH1* const h_fail,
-        const std::string pt_label, 
-        const std::string eta_label, 
         const float mlow = 60.0,
-        const float mhigh = 120.0
+        const float mhigh = 120.0,
+        const float mass_bin_width = 2.0,
+        const std::string a_bin_label = "", 
+        const std::string b_bin_label = "" 
     );
 
 } // namespace tnp

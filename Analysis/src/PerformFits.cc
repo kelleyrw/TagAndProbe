@@ -108,16 +108,16 @@ namespace tnp
 
     struct MCTemplateConvGausPdf : public PdfBase
     {
-        MCTemplateConvGausPdf(RooRealVar &m, TH1F* hist, const std::string& label, RooRealVar *sigma0=0, int intOrder=1);
+        MCTemplateConvGausPdf(RooRealVar &m, TH1* hist, const std::string& label, RooRealVar *sigma0=0, int intOrder=1);
         RooRealVar  *mean;
         RooRealVar  *sigma;
         RooGaussian *gaus;
-        TH1F        *inHist;
+        TH1         *inHist;
         RooDataHist *dataHist;
         RooHistPdf  *histPdf;
     };
 
-    MCTemplateConvGausPdf::MCTemplateConvGausPdf(RooRealVar &m, TH1F* hist, const std::string& label, RooRealVar *sigma0, int intOrder)
+    MCTemplateConvGausPdf::MCTemplateConvGausPdf(RooRealVar &m, TH1* hist, const std::string& label, RooRealVar *sigma0, int intOrder)
     {  
         string title;
         title = Form("mean%s"  , label.c_str()); mean  = new RooRealVar(title.c_str(), title.c_str(), 0 , -10 , 10);
@@ -125,7 +125,7 @@ namespace tnp
         title = Form("gaus%s"  , label.c_str()); gaus  = new RooGaussian(title.c_str(), title.c_str(), m, *mean , *sigma);
 
         title = Form("inHist_%s",hist->GetName());
-        inHist = dynamic_cast<TH1F*>(hist->Clone(title.c_str()));
+        inHist = dynamic_cast<TH1*>(hist->Clone(title.c_str()));
         title = Form("dataHist%s",label.c_str()); dataHist = new RooDataHist(title.c_str(), title.c_str(), RooArgSet(m), inHist);
         title = Form("histPdf%s" ,label.c_str()); histPdf  = new RooHistPdf(title.c_str(), title.c_str(), m,*dataHist, intOrder);
         title = Form("signal%s"  ,label.c_str()); model    = new RooFFTConvPdf(title.c_str(), title.c_str(), m, *histPdf, *gaus);
@@ -571,7 +571,7 @@ namespace tnp
     // wrapper to get the PDFs
     // ----------------------------------------------------------------- //
 
-    PdfBase* CreateModelPdf(Model::value_type model, RooRealVar &x, const std::string& label = "", TH1F* const hist_template = NULL)
+    PdfBase* CreateModelPdf(Model::value_type model, RooRealVar &x, const std::string& label = "", TH1* const hist_template = NULL)
     {
         if (model == Model::MCTemplate && hist_template == NULL)
         {
@@ -745,12 +745,13 @@ namespace tnp
         const Model::value_type bkg_fail_model, 
         const TH1* const h_pass, 
         const TH1* const h_fail,
-        const std::string pt_label, 
-        const std::string eta_label, 
         const float mass_low,
         const float mass_high,
-        TH1F* const h_pass_template,
-        TH1F* const h_fail_template
+        const float mass_bin_width,
+        const std::string a_bin_label, 
+        const std::string b_bin_label, 
+        TH1* const h_pass_template,
+        TH1* const h_fail_template
     )
     {
         // test template hist's existence
@@ -871,8 +872,8 @@ namespace tnp
         model_pass.plotOn(mframe_pass,RooFit::Components("ebkg_pass"), RooFit::LineStyle(kDashed), RooFit::LineColor(kRed));
         mframe_pass->SetTitle("Passing Probes");
         mframe_pass->Draw();
-        TPaveText *pt_box    = CreateTextBox(0.15, 0.80, 0.41, 0.85, pt_label ); pt_box->Draw();
-        TPaveText *eta_box   = CreateTextBox(0.15, 0.75, 0.33, 0.80, eta_label); eta_box->Draw();
+        TPaveText *a_box         = CreateTextBox(0.15, 0.80, 0.41, 0.85, a_bin_label); a_box->Draw();
+        TPaveText *b_box         = CreateTextBox(0.15, 0.75, 0.33, 0.80, b_bin_label); b_box->Draw();
         TPaveText *npass_box     = CreateTextBox(0.15, 0.70, 0.33, 0.75, Form("%1.0f Events", nbkg_pass_max)); npass_box->Draw();
         TPaveText *eff_box       = CreateTextBox(0.65, 0.80, 0.85, 0.84, Form("#varepsilon = %1.3f #pm %1.3f"   , int_data_eff.value , int_data_eff.error )); eff_box->Draw();
         TPaveText *nsig_pass_box = CreateTextBox(0.65, 0.75, 0.85, 0.79, Form("N^{pass}_{sig} = %1.0f #pm %1.0f", npass_sig.value    , npass_sig.error    )); nsig_pass_box->Draw();
@@ -884,14 +885,14 @@ namespace tnp
 
         // failing plot
         simple_result.cfail->cd(); 
-        RooPlot *mframe_fail = mass.frame(RooFit::Bins(static_cast<int>(fabs(mass_high-mass_low)/2.0)));
+        RooPlot *mframe_fail = mass.frame(RooFit::Bins(static_cast<int>(fabs(mass_high-mass_low)/mass_bin_width)));
         data_fail.plotOn(mframe_fail, RooFit::MarkerStyle(kFullCircle), RooFit::MarkerSize(0.8), RooFit::DrawOption("ZP"));
         model_fail.plotOn(mframe_fail);
         model_fail.plotOn(mframe_fail,RooFit::Components("ebkg_fail"), RooFit::LineStyle(kDashed), RooFit::LineColor(kRed));
         mframe_fail->SetTitle("Failing Probes");
         mframe_fail->Draw();
-        pt_box->Draw();
-        eta_box->Draw();
+        a_box->Draw();
+        b_box->Draw();
         TPaveText *nfail_box = CreateTextBox(0.15, 0.70, 0.33, 0.75, Form("%1.0f Events", nbkg_fail_max)); nfail_box->Draw();
         eff_box->Draw();
         nsig_pass_box->Draw();
@@ -938,11 +939,11 @@ namespace tnp
         //const Model::value_type model, 
         TH1* const h_pass, 
         TH1* const h_fail,
-        const std::string pt_label, 
-        const std::string eta_label, 
         const float mass_low,
         const float mass_high,
-        const float mass_bin_width
+        const float mass_bin_width,
+        const std::string a_bin_label, 
+        const std::string b_bin_label
     )
     {
         const float zwin_low  = mass_low;
@@ -971,8 +972,8 @@ namespace tnp
         hist_pass.plotOn(mframe_pass);
         mframe_pass->SetTitle("MC Passing Probes");
         mframe_pass->Draw();
-        TPaveText *pt_box    = CreateTextBox(0.15, 0.80, 0.41, 0.85, pt_label ); pt_box->Draw();
-        TPaveText *eta_box   = CreateTextBox(0.15, 0.75, 0.33, 0.80, eta_label); eta_box->Draw();
+        TPaveText *a_box     = CreateTextBox(0.15, 0.80, 0.41, 0.85, a_bin_label); a_box->Draw();
+        TPaveText *b_box     = CreateTextBox(0.15, 0.75, 0.33, 0.80, b_bin_label); b_box->Draw();
         TPaveText *npass_box = CreateTextBox(0.15, 0.70, 0.33, 0.75, Form("%1.0f Events", h_pass->Integral())); npass_box->Draw();
         TPaveText *eff_box   = CreateTextBox(0.65, 0.80, 0.85, 0.84, "#varepsilon = " + simple_result.eff_str()); eff_box->Draw();
         TPaveText *num_box   = CreateTextBox(0.65, 0.75, 0.85, 0.79, Form("N_{pass} = %1.0f" , simple_result.num.value)); num_box->Draw();
@@ -985,8 +986,8 @@ namespace tnp
         hist_fail.plotOn(mframe_fail);
         mframe_fail->SetTitle("MC Failing Probes");
         mframe_fail->Draw();
-        pt_box->Draw();
-        eta_box->Draw();
+        a_box->Draw();
+        b_box->Draw();
         TPaveText *nfail_box = CreateTextBox(0.15, 0.70, 0.33, 0.75, Form("%1.0f Events", h_fail->Integral())); nfail_box->Draw();
         eff_box->Draw();
         num_box->Draw();

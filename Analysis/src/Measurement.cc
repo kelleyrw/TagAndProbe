@@ -46,18 +46,18 @@ namespace tnp
 
     std::string GetStringFromSelection(const Selection::value_type sel_type)
     {
-        if (sel_type == Selection::EGammaDenID       ) return "egammadenid";
-        if (sel_type == Selection::EGammaDenIso      ) return "egammadeniso";
-        if (sel_type == Selection::EGammaDenBoth     ) return "egammadenboth";
-        if (sel_type == Selection::EGammaNum         ) return "egammanum";
-        if (sel_type == Selection::SameSignElDenID   ) return "samesigneldenid";
-        if (sel_type == Selection::SameSignElDenIso  ) return "samesigneldeniso";
-        if (sel_type == Selection::SameSignElDenBoth ) return "samesigneldenboth";
-        if (sel_type == Selection::SameSignElNum     ) return "samesignelnum";
-        if (sel_type == Selection::SameSignMuDenID   ) return "samesignmudenid";
-        if (sel_type == Selection::SameSignMuDenIso  ) return "samesignmudeniso";
-        if (sel_type == Selection::SameSignMuDenBoth ) return "samesignmudenboth";
-        if (sel_type == Selection::SameSignMuNum     ) return "samesignmunum";
+        if (sel_type == Selection::EGammaDenID      ) return "EGammadenID";
+        if (sel_type == Selection::EGammaDenIso     ) return "EGammadenIso";
+        if (sel_type == Selection::EGammaDenBoth    ) return "EGammadenBoth";
+        if (sel_type == Selection::EGammaNum        ) return "EGammaNum";
+        if (sel_type == Selection::SameSignElDenID  ) return "SameSignElDenID";
+        if (sel_type == Selection::SameSignElDenIso ) return "SameSignElDenIso";
+        if (sel_type == Selection::SameSignElDenBoth) return "SameSignElDenBoth";
+        if (sel_type == Selection::SameSignElNum    ) return "SameSignElNum";
+        if (sel_type == Selection::SameSignMuDenID  ) return "SameSignMuDenID";
+        if (sel_type == Selection::SameSignMuDenIso ) return "SameSignMuDenIso";
+        if (sel_type == Selection::SameSignMuDenBoth) return "SameSignMuDenBoth";
+        if (sel_type == Selection::SameSignMuNum    ) return "SameSignMuNum";
         throw std::invalid_argument("[tnp::GetStringFromSelection]: ERROR - invalid value!"); 
     }
 

@@ -26,6 +26,7 @@
 #include "TagAndProbe/Analysis/interface/goodrun.h"
 #include "TagAndProbe/Analysis/interface/Measurement.h"
 #include "TagAndProbe/Analysis/interface/LeptonSelections.h"
+#include "TagAndProbe/Analysis/interface/Dataset.h"
 
 using namespace std;
 
@@ -33,55 +34,55 @@ using namespace std;
 // hold the information relevant to the a dataset
 // ------------------------------------------------------------------------------------ //
 
-struct Dataset
-{
-    // construct:
-    Dataset(const edm::ParameterSet& pset);
-
-    Dataset
-    (
-        const std::string& name,
-        const std::vector<std::string>& input_file_names,
-        const std::string& run_list = "",
-        const bool is_data = false
-    );
-
-    // members:
-    std::string m_name;
-    std::vector<std::string> m_input_file_names;
-    std::string m_run_list;
-    bool m_is_data;
-};
-
-Dataset::Dataset
-(
-    const std::string& name,
-    const std::vector<std::string>& input_file_names,
-    const std::string& run_list,
-    const bool is_data
-)
-    : m_name(name)
-    , m_input_file_names(input_file_names)
-    , m_run_list(run_list)
-    , m_is_data(is_data)
-{
-}
-
-Dataset::Dataset(const edm::ParameterSet& pset)
-    : m_name(pset.getParameter<std::string>("name"))
-    , m_input_file_names(pset.getParameter<std::vector<std::string> >("files"))
-    , m_run_list(pset.getParameter<std::string>("run_list"))
-    , m_is_data(pset.getParameter<bool>("is_data"))
-{
-}
-
-// non member functions
-std::vector<Dataset> GetDatasetsFromVPSet(const std::vector<edm::ParameterSet>& psets)
-{
-    std::vector<Dataset> results;
-    results.assign(psets.begin(), psets.end());
-    return results;
-}
+//struct Dataset
+//{
+//    // construct:
+//    Dataset(const edm::ParameterSet& pset);
+//
+//    Dataset
+//    (
+//        const std::string& name,
+//        const std::vector<std::string>& input_file_names,
+//        const std::string& run_list = "",
+//        const bool is_data = false
+//    );
+//
+//    // members:
+//    std::string m_name;
+//    std::vector<std::string> m_input_file_names;
+//    std::string m_run_list;
+//    bool m_is_data;
+//};
+//
+//Dataset::Dataset
+//(
+//    const std::string& name,
+//    const std::vector<std::string>& input_file_names,
+//    const std::string& run_list,
+//    const bool is_data
+//)
+//    : m_name(name)
+//    , m_input_file_names(input_file_names)
+//    , m_run_list(run_list)
+//    , m_is_data(is_data)
+//{
+//}
+//
+//Dataset::Dataset(const edm::ParameterSet& pset)
+//    : m_name(pset.getParameter<std::string>("name"))
+//    , m_input_file_names(pset.getParameter<std::vector<std::string> >("files"))
+//    , m_run_list(pset.getParameter<std::string>("run_list"))
+//    , m_is_data(pset.getParameter<bool>("is_data"))
+//{
+//}
+//
+//// non member functions
+//std::vector<Dataset> GetDatasetsFromVPSet(const std::vector<edm::ParameterSet>& psets)
+//{
+//    std::vector<Dataset> results;
+//    results.assign(psets.begin(), psets.end());
+//    return results;
+//}
 
 
 // Looper class to hold all the variables and make the histograms 
@@ -188,7 +189,7 @@ void MassPlotLooper::BookHists()
     // mass bins
     const int num_mass_bins = static_cast<int>(fabs(m_mass_high - m_mass_low)/m_mass_bin_width);
 
-    // use |eta} ?
+    // use |eta| ?
     const std::string phi_title = (not m_phi_bins.empty() and m_phi_bins.front() >= 0 ? "|#phi|" : "#phi");
     const std::string eta_title = (not m_eta_bins.empty() and m_eta_bins.front() >= 0 ? "|#eta|" : "#eta");
 
@@ -458,7 +459,6 @@ void MassPlotLooper::EndJob()
     {
         std::string output_print_path = lt::string_replace_all(m_output_file_name, ".root", "") + "/" + m_suffix;
         cout << "Printing histograms to: " << output_print_path  << endl;
-        cout << m_hist_container["h_pass_pt3"]->GetEntries() << endl;
         m_hist_container.Print(output_print_path, m_suffix);
     }
 }
@@ -501,7 +501,7 @@ template <typename Function>
 int ScanChain
 (
     Function analyze, 
-    const Dataset& dataset,
+    const tnp::Dataset& dataset,
     const int num_events = -1,
     const bool verbose = false,
     const int evt_run = -1,
@@ -718,11 +718,12 @@ int ScanChain
 int main(int argc, char **argv)
 try
 {
-    // parse the inputs
-    // -------------------------------------------------------------------------------------------------//
-
+    // FWLite libs
     gSystem->Load("libFWCoreFWLite");
     AutoLibraryLoader::enable();
+
+    // parse the inputs
+    // -------------------------------------------------------------------------------------------------//
 
     // check that the python is passed
     if (argc < 2)
@@ -738,96 +739,90 @@ try
     }
 
     // get the python configuration
-    const edm::ParameterSet& process               = edm::readPSetsFrom(pset_filename)->getParameter<edm::ParameterSet>("process");
-    const std::vector<edm::ParameterSet>& tnp_cfgs = process.getParameter<std::vector<edm::ParameterSet>>("tnp_make_plots");
+    const edm::ParameterSet& process = edm::readPSetsFrom(pset_filename)->getParameter<edm::ParameterSet>("process");
+    const edm::ParameterSet& tnp_cfg = process.getParameter<edm::ParameterSet>("tnp_make_plots");
 
     // Looper of parameter sets
     // Makes a set of histogram for each element of tnp_cfgs vector for each dataset
     // -------------------------------------------------------------------------------------------------//
 
-    for (std::vector<edm::ParameterSet>::const_iterator tnp_cfg_iter = tnp_cfgs.begin(); tnp_cfg_iter != tnp_cfgs.end(); tnp_cfg_iter++)
+    // get the inputs 
+    const long long max_events                = tnp_cfg.getParameter<long long>("max_events");
+    const tnp::Lepton::value_type lepton_type = tnp::GetLeptonFromString(tnp_cfg.getParameter<std::string>("lepton_type"));
+    const double mass_low                     = tnp_cfg.getParameter<double>("mass_low" );
+    const double mass_high                    = tnp_cfg.getParameter<double>("mass_high");
+    const double mass_bin_width               = tnp_cfg.getParameter<double>("mass_bin_width");
+    const bool verbose                        = tnp_cfg.getParameter<bool>("verbose");
+    const std::string suffix                  = tnp_cfg.getParameter<std::string>("suffix");
+    const std::string analysis_path           = lt::getenv("CMSSW_BASE") + "/src/TagAndProbe/Analysis";
+    const std::string output_label            = tnp_cfg.getParameter<string>("output_label");
+    const std::vector<double> pt_bins         = tnp_cfg.getParameter<std::vector<double> >("pt_bins");
+    const std::vector<double> eta_bins        = tnp_cfg.getParameter<std::vector<double> >("eta_bins");
+    const std::vector<double> phi_bins        = tnp_cfg.getParameter<std::vector<double> >("phi_bins");
+    const std::vector<double> nvtx_bins       = tnp_cfg.getParameter<std::vector<double> >("nvtx_bins");
+    const std::vector<tnp::Dataset> datasets  = tnp::GetDatasetsFromVPSet(tnp_cfg.getParameter<std::vector<edm::ParameterSet> >("datasets"));
+
+    // numerator and denominator    
+    const tnp::Selection::value_type num_selection = tnp::GetSelectionFromString(tnp_cfg.getParameter<std::string>("numerator"  ));
+    const tnp::Selection::value_type den_selection = tnp::GetSelectionFromString(tnp_cfg.getParameter<std::string>("denominator"));
+
+    // for each dataset makes the set of histograms
+    // -------------------------------------------------------------------------------------------------//
+
+    for (std::vector<tnp::Dataset>::const_iterator dataset_iter = datasets.begin(); dataset_iter != datasets.end(); dataset_iter++)
     {
         // convenience
-        const edm::ParameterSet& tnp_cfg = *tnp_cfg_iter;
-
-        // get the inputs 
-        const long long max_events                = tnp_cfg.getParameter<long long>("max_events");
-        const tnp::Lepton::value_type lepton_type = tnp::GetLeptonFromString(tnp_cfg.getParameter<std::string>("lepton_type"));
-        const double mass_low                     = tnp_cfg.getParameter<double>("mass_low" );
-        const double mass_high                    = tnp_cfg.getParameter<double>("mass_high");
-        const double mass_bin_width               = tnp_cfg.getParameter<double>("mass_bin_width");
-        const bool verbose                        = tnp_cfg.getParameter<bool>("verbose");
-        const std::string suffix                  = tnp_cfg.getParameter<std::string>("suffix");
-        const std::string analysis_path           = lt::getenv("CMSSW_BASE") + "/src/TagAndProbe/Analysis";
-        const std::string output_label            = tnp_cfg.getParameter<string>("output_label");
-        const std::vector<double> pt_bins         = tnp_cfg.getParameter<std::vector<double> >("pt_bins");
-        const std::vector<double> eta_bins        = tnp_cfg.getParameter<std::vector<double> >("eta_bins");
-        const std::vector<double> phi_bins        = tnp_cfg.getParameter<std::vector<double> >("phi_bins");
-        const std::vector<double> nvtx_bins       = tnp_cfg.getParameter<std::vector<double> >("nvtx_bins");
-        const std::vector<Dataset> datasets       = GetDatasetsFromVPSet(tnp_cfg.getParameter<std::vector<edm::ParameterSet> >("datasets"));
+        const tnp::Dataset& dataset = *dataset_iter;
 
         // for each dataset makes the set of histograms
         // -------------------------------------------------------------------------------------------------//
 
-        for (std::vector<Dataset>::const_iterator dataset_iter = datasets.begin(); dataset_iter != datasets.end(); dataset_iter++)
-        {
-            // convenience
-            const Dataset& dataset = *dataset_iter;
 
-            // for each dataset makes the set of histograms
-            // -------------------------------------------------------------------------------------------------//
+        // output ROOT file name
+        // (i.e. analysis_path/plots/output_label/lepton_type/den_num/dataset.root)
+        const std::string output_file_name = Form("%s/plots/%s/%s/%s_%s/%s.root",
+            analysis_path.c_str(),
+            output_label.c_str(),
+            GetStringFromLepton(lepton_type).c_str(),
+            GetStringFromSelection(den_selection).c_str(),
+            GetStringFromSelection(num_selection).c_str(),
+            dataset.m_name.c_str()
+        );
 
-            // numerator and denominator    
-            const tnp::Selection::value_type num_selection = tnp::GetSelectionFromString(tnp_cfg.getParameter<std::string>("numerator"  ));
-            const tnp::Selection::value_type den_selection = tnp::GetSelectionFromString(tnp_cfg.getParameter<std::string>("denominator"));
+        // print out the parameters for each run
+        cout << "\n[tnp_make_plots] running with the following inputs:" << endl;
+        printf("%-15s = %lld\n", "max_events"   , max_events                                   );
+        printf("%-15s = %s\n"  , "name"         , dataset.m_name.c_str()                       );
+        printf("%-15s = %s\n"  , "run_list"     , dataset.m_run_list.c_str()                   );
+        printf("%-15s = %d\n"  , "is_data"      , dataset.m_is_data                            );
+        printf("%-15s = %s\n"  , "num_selection", GetStringFromSelection(den_selection).c_str());
+        printf("%-15s = %s\n"  , "den_selection", GetStringFromSelection(num_selection).c_str());
 
-            // output ROOT file name
-            // (i.e. analysis_path/plots/output_label/lepton_type/den_num/dataset.root)
-            const std::string output_file_name = Form("%s/plots/%s/%s/%s_%s/%s.root",
-                analysis_path.c_str(),
-                output_label.c_str(),
-                GetStringFromLepton(lepton_type).c_str(),
-                GetStringFromSelection(den_selection).c_str(),
-                GetStringFromSelection(num_selection).c_str(),
-                dataset.m_name.c_str()
-            );
-
-            // print out the parameters for each run
-            cout << "\n[tnp_make_plots] running with the following inputs:" << endl;
-            printf("%-15s = %lld\n", "max_events"   , max_events                                   );
-            printf("%-15s = %s\n"  , "name"         , dataset.m_name.c_str()                       );
-            printf("%-15s = %s\n"  , "run_list"     , dataset.m_run_list.c_str()                   );
-            printf("%-15s = %d\n"  , "is_data"      , dataset.m_is_data                            );
-            printf("%-15s = %s\n"  , "num_selection", GetStringFromSelection(den_selection).c_str());
-            printf("%-15s = %s\n"  , "den_selection", GetStringFromSelection(num_selection).c_str());
-
-            // analysis looper
-            ScanChain
+        // analysis looper
+        ScanChain
+        (
+            MassPlotLooper
             (
-                MassPlotLooper
-                (
-                     output_file_name,
-                     lepton_type,
-                     num_selection,
-                     den_selection,
-                     mass_low,
-                     mass_high,
-                     mass_bin_width,
-                     pt_bins,
-                     eta_bins,
-                     phi_bins,
-                     nvtx_bins,
-                     dataset.m_is_data,
-                     suffix,
-                     verbose
-                ), 
-                dataset,
-                max_events
-            );
+                output_file_name,
+                lepton_type,
+                num_selection,
+                den_selection,
+                mass_low,
+                mass_high,
+                mass_bin_width,
+                pt_bins,
+                eta_bins,
+                phi_bins,
+                nvtx_bins,
+                dataset.m_is_data,
+                suffix,
+                verbose
+            ), 
+            dataset,
+            max_events
+        );
 
-        } // end loop over datasets 
-
-    } // end loop over tnp_cfgs
+    } // end loop over datasets 
 
     // done
     return 0;

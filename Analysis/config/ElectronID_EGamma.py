@@ -41,7 +41,7 @@ tnp_parameters = cms.PSet(
 	max_events = cms.int64(-1),
 
 	## verbosity (for trouble shooting)
-	verbose = cms.bool(False),
+	verbose = cms.bool(True),
 
 	## mass range for resonance window
 	mass_low       = cms.double(60.0),  # GeV
@@ -68,14 +68,17 @@ tnp_parameters = cms.PSet(
 
 	## Parameters for the fitting 
 	## --------------------------------------------------------- #
+
+	## hisogram files to use with MC Templates (if used) 
+	mc_template_file = cms.string(analysis_path + "/plots/ElectronID_EGamma/electron/EGammaDenID_EGammaNum/dy_full.root"),
 	
 	## models for pt bins 
 	pt_models = cms.vstring( 
 	#          sig pass,        sig fail,      bkg pass,      bkg fail
 		"BreitWignerCB", "BreitWignerCB", "Exponential", "Exponential", # pt0
 		"BreitWignerCB", "BreitWignerCB", "Exponential", "Exponential", # pt1
-		"MCTemplate"   , "MCTemplate"   , "Poly3"      , "Poly3"      , # pt2
-		"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"     , # pt3
+		"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "Exponential", # pt2
+		"MCTemplate"   , "MCTemplate"   , "Exponential", "Chebychev"  , # pt3
 		"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # pt4
 		"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # pt5
 	),
@@ -205,7 +208,7 @@ tnp_parameters = cms.PSet(
 ## will make a set of plots for each element of the cms.VPSet
 ## ------------------------------------------------------------- #
 
-process.tnp_make_plots = cms.VPSet(tnp_parameters)
+process.tnp_make_plots = tnp_parameters
 
 ## ------------------------------------------------------------- #
 ## process to run to fit the plots
