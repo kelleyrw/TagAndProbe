@@ -4,7 +4,7 @@ import os
 ## path the analysis
 analysis_path = os.getenv("CMSSW_BASE") + "/src/TagAndProbe/Analysis"
 
-## add the configuration path (if not already there) 
+## add the configuration path
 import sys
 sys.path.append(analysis_path + "/config")
 
@@ -58,9 +58,9 @@ pt_models = cms.vstring(
 #          sig pass,        sig fail,      bkg pass,      bkg fail
 	"BreitWignerCB", "BreitWignerCB", "Exponential", "Exponential", # pt0
 	"BreitWignerCB", "BreitWignerCB", "Exponential", "Exponential", # pt1
-   	"MCTemplate"   , "MCTemplate"   , "Poly3"      , "Poly3"      , # pt2
-   	"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"     , # pt3
-    "MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # pt4
+	"MCTemplate"   , "MCTemplate"   , "Poly3"      , "Poly3"      , # pt2
+	"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"     , # pt3
+	"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # pt4
 	"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # pt5
 )
 
@@ -69,9 +69,9 @@ eta_models = cms.vstring(
 #          sig pass,        sig fail,      bkg pass,      bkg fail
 	"BreitWignerCB", "BreitWignerCB", "Exponential", "Exponential", # eta0
 	"BreitWignerCB", "BreitWignerCB", "Exponential", "Exponential", # eta1
-   	"MCTemplate"   , "MCTemplate"   , "Poly3"      , "Poly3"      , # eta2
-   	"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"     , # eta3
-    "MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # eta4
+	"MCTemplate"   , "MCTemplate"   , "Poly3"      , "Poly3"      , # eta2
+	"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"     , # eta3
+	"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # eta4
 )
 
 ## models for phi bins 
@@ -79,11 +79,11 @@ phi_models = cms.vstring(
 #          sig pass,        sig fail,      bkg pass,      bkg fail
 	"BreitWignerCB", "BreitWignerCB", "Exponential", "Exponential", # phi0
 	"BreitWignerCB", "BreitWignerCB", "Exponential", "Exponential", # phi1
-   	"MCTemplate"   , "MCTemplate"   , "Poly3"      , "Poly3"      , # phi2
-   	"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"     , # phi3
-    "MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # phi4
-    "MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # phi5
-    "MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # phi6
+	"MCTemplate"   , "MCTemplate"   , "Poly3"      , "Poly3"      , # phi2
+	"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"     , # phi3
+	"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # phi4
+	"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # phi5
+	"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # phi6
 )
 
 ## models for nvtx bins 
@@ -91,12 +91,12 @@ nvtx_models = cms.vstring(
 #          sig pass,        sig fail,      bkg pass,      bkg fail
 	"BreitWignerCB", "BreitWignerCB", "Exponential", "Exponential", # nvtx0
 	"BreitWignerCB", "BreitWignerCB", "Exponential", "Exponential", # nvtx1
-   	"MCTemplate"   , "MCTemplate"   , "Poly3"      , "Poly3"      , # nvtx2
-   	"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"     , # nvtx3
-    "MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # nvtx4
-    "MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # nvtx5
-    "MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # nvtx6
-    "MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # nvtx7
+	"MCTemplate"   , "MCTemplate"   , "Poly3"      , "Poly3"      , # nvtx2
+	"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"     , # nvtx3
+	"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # nvtx4
+	"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # nvtx5
+	"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # nvtx6
+	"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # nvtx7
 )
 
 
@@ -104,84 +104,84 @@ nvtx_models = cms.vstring(
 pt_vs_eta_models = cms.vstring( 
 #          sig pass,        sig fail,      bkg pass,      bkg fail
 	"BreitWignerCB", "BreitWignerCB", "Exponential", "Exponential", # eta0, pt0
- 	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # eta1, pt0
- 	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # eta2, pt0
- 	"BreitWignerCB", "BreitWignerCB", "Exponential", "Exponential", # eta3, pt0
- 	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential"  # eta4, pt0
+	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # eta1, pt0
+	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # eta2, pt0
+	"BreitWignerCB", "BreitWignerCB", "Exponential", "Exponential", # eta3, pt0
+	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential"  # eta4, pt0
 , 
 	"BreitWignerCB", "BreitWignerCB", "Exponential", "Exponential", # eta0, pt1
- 	"BreitWignerCB", "BreitWignerCB", "Exponential", "Exponential", # eta1, pt1
- 	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # eta2, pt1
- 	"BreitWignerCB", "BreitWignerCB", "Exponential", "Exponential", # eta3, pt1
- 	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential"  # eta4, pt1
-,                                                                
-   	"MCTemplate"   , "MCTemplate"   , "Poly3"      , "Poly3"      , # eta0, pt2
+	"BreitWignerCB", "BreitWignerCB", "Exponential", "Exponential", # eta1, pt1
+	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # eta2, pt1
+	"BreitWignerCB", "BreitWignerCB", "Exponential", "Exponential", # eta3, pt1
+	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential"  # eta4, pt1
+,
+	"MCTemplate"   , "MCTemplate"   , "Poly3"      , "Poly3"      , # eta0, pt2
 	"MCTemplate"   , "MCTemplate"   , "Poly3"      , "Poly3"      , # eta1, pt2 
 	"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"     , # eta2, pt2
 	"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"     , # eta3, pt2
 	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential"  # eta4, pt2
-,                                                                
-   	"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"     , # eta0, pt3
+,
+	"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"     , # eta0, pt3
 	"MCTemplate"   , "MCTemplate"   , "Poly3"      , "Poly3"      , # eta1, pt3
 	"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"     , # eta2, pt3
 	"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"     , # eta3, pt3
 	"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"       # eta4, pt3
-,                                                                
-    "MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # eta0, pt4
+,
+	"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # eta0, pt4
 	"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # eta1, pt4
 	"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # eta2, pt4
 	"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # eta3, pt4
 	"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"    # eta4, pt4
-,                                                                
+,
 	"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # eta0, pt5
- 	"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # eta1, pt5
- 	"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # eta2, pt5
- 	"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # eta3, pt5
- 	"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"    # eta4, pt5
+	"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # eta1, pt5
+	"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # eta2, pt5
+	"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # eta3, pt5
+	"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"    # eta4, pt5
 )
 
 ## models for eta vs phi bins 
 eta_vs_phi_models = cms.vstring( 
 #          sig pass,        sig fail,      bkg pass,      bkg fail
 	"BreitWignerCB", "BreitWignerCB", "Exponential", "Exponential", # phi0, eta0
- 	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # phi1, eta0
- 	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # phi2, eta0
- 	"BreitWignerCB", "BreitWignerCB", "Exponential", "Exponential", # phi3, eta0
- 	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # phi4, eta0
- 	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # phi5, eta0
- 	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential"  # phi6, eta0
+	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # phi1, eta0
+	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # phi2, eta0
+	"BreitWignerCB", "BreitWignerCB", "Exponential", "Exponential", # phi3, eta0
+	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # phi4, eta0
+	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # phi5, eta0
+	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential"  # phi6, eta0
 , 
 	"BreitWignerCB", "BreitWignerCB", "Exponential", "Exponential", # phi0, eta1
- 	"BreitWignerCB", "BreitWignerCB", "Exponential", "Exponential", # phi1, eta1
- 	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # phi2, eta1
- 	"BreitWignerCB", "BreitWignerCB", "Exponential", "Exponential", # phi3, eta1
- 	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # phi4, eta1
- 	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # phi5, eta1
- 	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential"  # phi6, eta0
-,                                                                
-   	"MCTemplate"   , "MCTemplate"   , "Poly3"      , "Poly3"      , # phi0, eta2
-	"MCTemplate"   , "MCTemplate"   , "Poly3"      , "Poly3"      , # phi1, eta2 
+	"BreitWignerCB", "BreitWignerCB", "Exponential", "Exponential", # phi1, eta1
+	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # phi2, eta1
+	"BreitWignerCB", "BreitWignerCB", "Exponential", "Exponential", # phi3, eta1
+	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # phi4, eta1
+	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # phi5, eta1
+	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential"  # phi6, eta0
+,
+	"MCTemplate"   , "MCTemplate"   , "Poly3"      , "Poly3"      , # phi0, eta2
+	"MCTemplate"   , "MCTemplate"   , "Poly3"      , "Poly3"      , # phi1, eta2
 	"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"     , # phi2, eta2
 	"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"     , # phi3, eta2
 	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # phi4, eta2
- 	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # phi5, eta2
- 	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential"  # phi6, eta2
-,                                                                
-   	"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"     , # phi0, eta3
+	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # phi5, eta2
+	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential"  # phi6, eta2
+,
+	"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"     , # phi0, eta3
 	"MCTemplate"   , "MCTemplate"   , "Poly3"      , "Poly3"      , # phi1, eta3
 	"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"     , # phi2, eta3
 	"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"     , # phi3, eta3
 	"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"     , # phi4, eta3
- 	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # phi5, eta3
- 	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential"  # phi6, eta3
-,                                                                
-    "MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # phi0, eta4
+	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # phi5, eta3
+	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential"  # phi6, eta3
+,
+	"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # phi0, eta4
 	"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # phi1, eta4
 	"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # phi2, eta4
 	"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # phi3, eta4
 	"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # phi4, eta4
- 	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # phi5, eta4
- 	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential"  # phi6, eta4
+	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # phi5, eta4
+	"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential"  # phi6, eta4
 )
 
 ## electrons
