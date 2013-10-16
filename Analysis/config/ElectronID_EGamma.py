@@ -60,10 +60,10 @@ tnp_parameters = cms.PSet(
 	## supported pt, eta, phi, and # vertices
 	## note: for eta and phi, no negative bins means use |eta| and |phi|, respectively
 	pt_bins   = cms.vdouble(10, 15, 20, 30, 40, 50, 200),
-# 	eta_bins  = cms.vdouble(0, 0.8, 1.4442, 1.566, 2.0, 2.5),
+	eta_bins  = cms.vdouble(0, 0.8, 1.4442, 1.566, 2.0, 2.5),
 # 	phi_bins  = cms.vdouble(0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.15),
 # 	nvtx_bins = cms.vdouble(0, 5, 10, 15, 20, 25, 30, 35, 40),
-	eta_bins  = cms.vdouble(),
+# 	eta_bins  = cms.vdouble(),
 	phi_bins  = cms.vdouble(),
 	nvtx_bins = cms.vdouble(),
 	
