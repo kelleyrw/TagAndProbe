@@ -9,7 +9,7 @@ process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.GlobalTag.globaltag = "GR_R_52_V7::All"
 process.MessageLogger.cerr.FwkReport.reportEvery = 200
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(100) )
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(10) )
 
 # lepton maker
 process.load("Smurf.ProcessingAndSkimming.leptontreemaker_cff")
@@ -17,7 +17,7 @@ process.load("Smurf.ProcessingAndSkimming.leptontreemaker_cff")
 # input
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-        'root://xrootd.unl.edu//store/data/Run2012C/DoubleMu/AOD/PromptReco-v2/000/200/075/5A5F1D8A-D3DD-E111-8F14-BCAEC5329709.root'
+        'root://xrootd.unl.edu//store/data/Run2012C/SingleMu/AOD/24Aug2012-v1/00000/F475B31B-03EF-E111-BCC3-002590747DDC.root'
     )
 )
 
