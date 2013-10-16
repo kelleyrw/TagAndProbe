@@ -2,8 +2,8 @@
 
 # user input
 tag=tnp_V00-00-00
-path=/nfs-7/userdata/rwkelley/crab/leptonTrees 
-merged_path=/nfs-7/userdata/rwkelley/babies/leptonTrees/$tag
+path=/nfs-7/userdata/rwkelley/crab/lepton_trees 
+merged_path=/nfs-7/userdata/rwkelley/babies/lepton_trees/$tag
 
 # function to merge
 function do_merge

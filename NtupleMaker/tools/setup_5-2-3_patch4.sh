@@ -10,8 +10,8 @@
 # metadata
 # -------------------------------------------------------------------------- #
 
-# not used yet
-tag=""
+# tag 
+tag="tnp_V00-00-00"
 
 # checkouts
 # -------------------------------------------------------------------------- #
@@ -20,6 +20,9 @@ pushd $CMSSW_BASE/src
 
 # Smurf Code
 git clone https://github.com/drkovalskyi/Smurf.git
+pushd $CMSSW_BASE/src/Smurf
+git checkout $tag 
+popd
 
 # Egamma ID code (this has been moved to CMSSW but in later releases)
 cvs co -r V00-00-06 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools
