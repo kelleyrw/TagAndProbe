@@ -13,7 +13,8 @@ sys.path.append(analysis_path + "/config")
 ## ------------------------------------------------------------------------------------------------------------------- #
 
 ## path to the lepton trees
-lepton_tree_path = "/Users/rwk7t/Data/babies/leptonTrees/tnp_V00-00-00"
+lepton_tree_tag  = "tnp_V00-00-00"
+lepton_tree_path = "/nfs-7/userdata/rwkelley/babies/lepton_trees/" + lepton_tree_tag
 
 ## good run list
 run_list = cms.string(analysis_path + "/json/final_19p49fb.txt")
@@ -35,7 +36,7 @@ dy_fast = cms.PSet(
 )
 
 ## muon triggered data 
-data_mu = cms.PSet(
+double_mu = cms.PSet(
 	name     = cms.string("data_double_mu"),
 	files    = cms.vstring([lepton_tree_path+'/DoubleMu_Run2012*/*.root']),
 	is_data  = cms.bool(True),
@@ -44,13 +45,13 @@ data_mu = cms.PSet(
 
 single_mu = cms.PSet(
 	name     = cms.string("data_single_mu"),
-	files    = cms.vstring(['/Users/rwk7t/Data/babies/LeptonTree/V00-02-09/SingleMu/merged_Moriond.root']),
+	files    = cms.vstring([lepton_tree_path+'/SingleMu_Run2012*/*.root']),
 	is_data  = cms.bool(True),
 	run_list = run_list 
 )
 
 ## electron triggered data 
-data_el = cms.PSet(
+double_el = cms.PSet(
 	name     = cms.string("data_double_el"),
 	files    = cms.vstring([lepton_tree_path+'/DoubleElectron_Run2012*/*.root']),
 	is_data  = cms.bool(True),
@@ -59,7 +60,7 @@ data_el = cms.PSet(
 
 single_el = cms.PSet(
 	name     = cms.string("data_single_el"),
-	files    = cms.vstring(['/Users/rwk7t/Data/babies/LeptonTree/V00-02-09/SingleElectron/merged_Moriond.root']),
+	files    = cms.vstring([lepton_tree_path+'/SingleElectron_Run2012*/*.root']),
 	is_data  = cms.bool(True),
 	run_list = run_list 
 )
