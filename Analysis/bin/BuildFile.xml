@@ -6,7 +6,7 @@
     <use name="FWCore/PythonParameterSet"/>
     <use name="TagAndProbe/Analysis"/>
   </bin>
-  <bin file="tnp_fit_plots.cc">
+  <bin file="tnp_eff_plots.cc">
     <use name="FWCore/FWLite"/>
     <use name="FWCore/PythonParameterSet"/>
     <use name="TagAndProbe/Analysis"/>

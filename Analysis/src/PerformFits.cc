@@ -873,7 +873,7 @@ namespace tnp
         mframe_pass->SetTitle("Passing Probes");
         mframe_pass->Draw();
         TPaveText *a_box         = CreateTextBox(0.15, 0.80, 0.41, 0.85, a_bin_label); a_box->Draw();
-        TPaveText *b_box         = CreateTextBox(0.15, 0.75, 0.33, 0.80, b_bin_label); b_box->Draw();
+        TPaveText *b_box         = CreateTextBox(0.15, 0.75, 0.41, 0.80, b_bin_label); b_box->Draw();
         TPaveText *npass_box     = CreateTextBox(0.15, 0.70, 0.33, 0.75, Form("%1.0f Events", nbkg_pass_max)); npass_box->Draw();
         TPaveText *eff_box       = CreateTextBox(0.65, 0.80, 0.85, 0.84, Form("#varepsilon = %1.3f #pm %1.3f"   , int_data_eff.value , int_data_eff.error )); eff_box->Draw();
         TPaveText *nsig_pass_box = CreateTextBox(0.65, 0.75, 0.85, 0.79, Form("N^{pass}_{sig} = %1.0f #pm %1.0f", npass_sig.value    , npass_sig.error    )); nsig_pass_box->Draw();
@@ -973,7 +973,7 @@ namespace tnp
         mframe_pass->SetTitle("MC Passing Probes");
         mframe_pass->Draw();
         TPaveText *a_box     = CreateTextBox(0.15, 0.80, 0.41, 0.85, a_bin_label); a_box->Draw();
-        TPaveText *b_box     = CreateTextBox(0.15, 0.75, 0.33, 0.80, b_bin_label); b_box->Draw();
+        TPaveText *b_box     = CreateTextBox(0.15, 0.75, 0.41, 0.80, b_bin_label); b_box->Draw();
         TPaveText *npass_box = CreateTextBox(0.15, 0.70, 0.33, 0.75, Form("%1.0f Events", h_pass->Integral())); npass_box->Draw();
         TPaveText *eff_box   = CreateTextBox(0.65, 0.80, 0.85, 0.84, "#varepsilon = " + simple_result.eff_str()); eff_box->Draw();
         TPaveText *num_box   = CreateTextBox(0.65, 0.75, 0.85, 0.79, Form("N_{pass} = %1.0f" , simple_result.num.value)); num_box->Draw();

@@ -21,23 +21,23 @@ namespace tnp
     {
         enum value_type 
         {
-            // EGamma POG
-            EGammaDenID,
-            EGammaDenIso,
-            EGammaDenBoth,
-            EGammaNum,
+            // EGamma POG medium working point
+            EGammaMediumWPDenID,
+            EGammaMediumWPDenIso,
+            EGammaMediumWPDenBoth,
+            EGammaMediumWPNum,
 
-            // same sign electrons
-            SameSignElDenID,
-            SameSignElDenIso,
-            SameSignElDenBoth,
-            SameSignElNum,
+            // Muon POG tight working point
+            MuTightWPDenID,
+            MuTightWPDenIso,
+            MuTightWPDenBoth,
+            MuTightWPNum,
 
-            // same sign muons
-            SameSignMuDenID,
-            SameSignMuDenIso,
-            SameSignMuDenBoth,
-            SameSignMuNum,
+            // same sign (SUS-13-013) 
+            SameSignDenID,
+            SameSignDenIso,
+            SameSignDenBoth,
+            SameSignNum,
 
             static_size
         };

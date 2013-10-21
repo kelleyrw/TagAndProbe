@@ -27,10 +27,10 @@ tnp_parameters = cms.PSet(
 	## --------------------------------------------------------- #
 	
 	## type of lepton 
-	lepton_type = cms.string("electron"),
+	lepton_type = cms.string("muon"),
 
 	## output label to give it a unique name
-	output_label = cms.string("ElectronID_EGammaMediumWP"),
+	output_label = cms.string("MuID_MuTightWP"),
  
 	## suffix to print the plots (before the fit)
 	## blank means do not print
@@ -53,32 +53,29 @@ tnp_parameters = cms.PSet(
 	mass_bin_width = cms.double(2.0),   # GeV
 	
 	# datasets to run on
-	datasets = cms.VPSet(dy_full, single_el),
+	datasets = cms.VPSet(dy_full, single_mu),
 
 	## bins for the observables
 	## supported pt, eta, phi, and # vertices
 	## note: for eta and phi, no negative bins means use |eta| and |phi|, respectively
 	pt_bins   = cms.vdouble(10, 15, 20, 30, 40, 50, 200),
-	eta_bins  = cms.vdouble(0, 0.8, 1.4442, 1.566, 2.0, 2.5),
+	eta_bins  = cms.vdouble(0, 1.1, 2.5),
 	phi_bins  = cms.vdouble(0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.15),
 	nvtx_bins = cms.vdouble(0, 5, 10, 15, 20, 25, 30, 35, 40),
 	
 	## selection (from Measurements.h/cc) 
-	numerator   = cms.string("EGammaMediumWPNum"  ),
-	denominator = cms.string("EGammaMediumWPDenID"),
+	numerator   = cms.string("MuTightWPNum"  ),
+	denominator = cms.string("MuTightWPDenID"),
 
 	## Parameters for the fitting 
 	## --------------------------------------------------------- #
 
-	## hisogram files to use with MC Templates (if used) 
-# 	mc_template_file = cms.string(analysis_path + "/plots/ElectronID_EGammaMediumWP/electron/EGammaMediumWPDenID_EGammaMediumWPNum/dy_full.root"),
-	
 	## models for pt bins 
 	pt_models = cms.vstring( 
 	#          sig pass,        sig fail,      bkg pass,      bkg fail
 		"BreitWignerCB", "BreitWignerCB", "Exponential", "Exponential", # pt0
-		"BreitWignerCB", "MCTemplate"   , "Exponential", "ErfExp"     , # pt1
-		"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # pt2
+		"BreitWignerCB", "BreitWignerCB", "Exponential", "ErfExp"     , # pt1
+		"MCTemplate"   , "MCTemplate"   , "Exponential", "ErfExp"     , # pt2
 		"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "Chebychev"  , # pt3
 		"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # pt4
 		"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # pt5
@@ -88,10 +85,7 @@ tnp_parameters = cms.PSet(
 	eta_models = cms.vstring( 
 	#          sig pass,        sig fail,      bkg pass,      bkg fail
 		"MCTemplate"   , "BreitWignerCB", "Exponential", "Exponential", # eta0
-		"MCTemplate"   , "BreitWignerCB", "Exponential", "Exponential", # eta1
-		"MCTemplate"   , "MCTemplate"   , "Poly3"      , "Poly3"      , # eta2  # crack electrons (1.4442 < |eta| < 1.566)
-		"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # eta3
-		"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # eta4
+		"MCTemplate"   , "BreitWignerCB", "Exponential", "Exponential", # eta2
 	),
 	
 	## models for phi bins 
@@ -122,41 +116,23 @@ tnp_parameters = cms.PSet(
 	## models for pt vs eta bins 
 	pt_vs_eta_models = cms.vstring( 
 	#          sig pass,        sig fail,      bkg pass,      bkg fail
-		"BreitWignerCB", "BreitWignerCB", "Exponential", "Exponential", # eta0, pt0
-		"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # eta1, pt0
-		"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # eta2, pt0 # crack electrons (1.4442 < |eta| < 1.566)
-		"BreitWignerCB", "BreitWignerCB", "Exponential", "Exponential", # eta3, pt0
-		"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential"  # eta4, pt0
-	, 
+		"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # eta0, pt0
+		"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential"  # eta1, pt0
+	,                                                                                     
 		"BreitWignerCB", "BreitWignerCB", "Exponential", "Exponential", # eta0, pt1
-		"BreitWignerCB", "BreitWignerCB", "Exponential", "Exponential", # eta1, pt1
-		"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # eta2, pt1 # crack electrons (1.4442 < |eta| < 1.566)
-		"BreitWignerCB", "BreitWignerCB", "Exponential", "Exponential", # eta3, pt1
-		"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential"  # eta4, pt1
-	,
-		"MCTemplate"   , "MCTemplate"   , "Exponential", "ErfExp"     , # eta0, pt2
-		"MCTemplate"   , "MCTemplate"   , "Exponential", "ErfExp"     , # eta1, pt2 
-		"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"     , # eta2, pt2 # crack electrons (1.4442 < |eta| < 1.566)
-		"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # eta3, pt2
-		"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "Exponential"  # eta4, pt2
-	,
-		"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"     , # eta0, pt3
-		"MCTemplate"   , "MCTemplate"   , "Poly3"      , "Poly3"      , # eta1, pt3
-		"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"     , # eta2, pt3 # crack electrons (1.4442 < |eta| < 1.566)
-		"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "Chebychev"  , # eta3, pt3
-		"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"       # eta4, pt3
-	,
+		"BreitWignerCB", "BreitWignerCB", "Exponential", "Exponential"  # eta1, pt1
+	,                                                                                     
+		"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "Exponential", # eta0, pt2
+		"MCTemplate"   , "MCTemplate"   , "Poly3"      , "Exponential"  # eta1, pt2 
+	,                                                                                     
+		"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "Poly3Exp"   , # eta0, pt3
+		"MCTemplate"   , "MCTemplate"   , "Poly3"      , "Poly3"        # eta1, pt3
+	,                                                                                     
 		"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # eta0, pt4
-		"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # eta1, pt4
-		"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # eta2, pt4 # crack electrons (1.4442 < |eta| < 1.566)
-		"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # eta3, pt4
-		"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"    # eta4, pt4
-	,
+		"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"    # eta1, pt4
+	,                                                                                     
 		"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # eta0, pt5
-		"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # eta1, pt5
-		"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # eta2, pt5 # crack electrons (1.4442 < |eta| < 1.566)
-		"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # eta3, pt5
-		"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"    # eta4, pt5
+		"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"    # eta1, pt5
 	),
 	
 	## models for eta vs phi bins 
@@ -177,36 +153,21 @@ tnp_parameters = cms.PSet(
 		"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # phi4, eta1
 		"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # phi5, eta1
 		"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential"  # phi6, eta0
-	,
-		"MCTemplate"   , "MCTemplate"   , "Poly3"      , "Poly3"      , # phi0, eta2 # crack electrons (1.4442 < |eta| < 1.566)
-		"MCTemplate"   , "MCTemplate"   , "Poly3"      , "Poly3"      , # phi1, eta2 # crack electrons (1.4442 < |eta| < 1.566)
-		"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"     , # phi2, eta2 # crack electrons (1.4442 < |eta| < 1.566)
-		"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"     , # phi3, eta2 # crack electrons (1.4442 < |eta| < 1.566)
-		"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # phi4, eta2 # crack electrons (1.4442 < |eta| < 1.566)
-		"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # phi5, eta2 # crack electrons (1.4442 < |eta| < 1.566)
-		"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential"  # phi6, eta2 # crack electrons (1.4442 < |eta| < 1.566)
-	,
-		"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # phi0, eta3
-		"MCTemplate"   , "MCTemplate"   , "Poly3"      , "Exponential", # phi1, eta3
-		"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"     , # phi2, eta3
-		"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"     , # phi3, eta3
-		"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"     , # phi4, eta3
-		"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # phi5, eta3
-		"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential"  # phi6, eta3
-	,
-		"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # phi0, eta4
-		"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # phi1, eta4
-		"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # phi2, eta4
-		"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # phi3, eta4
-		"MCTemplate"   , "MCTemplate"   , "Chebychev"  , "Chebychev"  , # phi4, eta4
-		"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # phi5, eta4
-		"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential"  # phi6, eta4
 	),
 )
 
 
-tnp_parameters.mc_template_file = cms.string("%s/plots/%s/%s/%s_%s/%s.root" % (analysis_path, tnp_parameters.output_label.value(), tnp_parameters.lepton_type.value(), tnp_parameters.denominator.value(), tnp_parameters.numerator.value(), dy_full.name.value()))
+## ------------------------------------------------------------- #
+## hisogram files to use with MC Templates (if used) 
+## ------------------------------------------------------------- #
 
+tnp_parameters.mc_template_file = cms.string("%s/plots/%s/%s/%s_%s/%s.root" % (analysis_path, 
+                                                                               tnp_parameters.output_label.value(),
+                                                                               tnp_parameters.lepton_type.value(),
+                                                                               tnp_parameters.denominator.value(), 
+                                                                               tnp_parameters.numerator.value(), 
+                                                                               dy_full.name.value()))
+	
 ## ------------------------------------------------------------- #
 ## process to make the plots
 ## will make a set of plots for each element of the cms.VPSet

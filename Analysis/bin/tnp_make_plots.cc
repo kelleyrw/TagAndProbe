@@ -31,60 +31,6 @@
 using namespace std;
 
 
-// hold the information relevant to the a dataset
-// ------------------------------------------------------------------------------------ //
-
-//struct Dataset
-//{
-//    // construct:
-//    Dataset(const edm::ParameterSet& pset);
-//
-//    Dataset
-//    (
-//        const std::string& name,
-//        const std::vector<std::string>& input_file_names,
-//        const std::string& run_list = "",
-//        const bool is_data = false
-//    );
-//
-//    // members:
-//    std::string m_name;
-//    std::vector<std::string> m_input_file_names;
-//    std::string m_run_list;
-//    bool m_is_data;
-//};
-//
-//Dataset::Dataset
-//(
-//    const std::string& name,
-//    const std::vector<std::string>& input_file_names,
-//    const std::string& run_list,
-//    const bool is_data
-//)
-//    : m_name(name)
-//    , m_input_file_names(input_file_names)
-//    , m_run_list(run_list)
-//    , m_is_data(is_data)
-//{
-//}
-//
-//Dataset::Dataset(const edm::ParameterSet& pset)
-//    : m_name(pset.getParameter<std::string>("name"))
-//    , m_input_file_names(pset.getParameter<std::vector<std::string> >("files"))
-//    , m_run_list(pset.getParameter<std::string>("run_list"))
-//    , m_is_data(pset.getParameter<bool>("is_data"))
-//{
-//}
-//
-//// non member functions
-//std::vector<Dataset> GetDatasetsFromVPSet(const std::vector<edm::ParameterSet>& psets)
-//{
-//    std::vector<Dataset> results;
-//    results.assign(psets.begin(), psets.end());
-//    return results;
-//}
-
-
 // Looper class to hold all the variables and make the histograms 
 // ------------------------------------------------------------------------------------ //
 
@@ -249,8 +195,8 @@ void MassPlotLooper::BookHists()
             for (size_t eta_bin = 0; eta_bin != m_eta_bins.size()-1; eta_bin++)
             {
                 const std::string bin_title = Form("%1.0f GeV < p_{T} < %1.0f GeV, %1.2f < %s < %1.2f", m_pt_bins[pt_bin], m_pt_bins[pt_bin+1], m_eta_bins[eta_bin], eta_title.c_str(), m_eta_bins[eta_bin+1]);
-                hc.Add(new TH1F(Form("h_pass_pt%lu_eta%lu", pt_bin, eta_bin), Form("Passing probes (%s);tag & probe mass (GeV);Events / %1.1f (GeV)", bin_title.c_str(), m_mass_bin_width), num_mass_bins, m_mass_low, m_mass_high));
-                hc.Add(new TH1F(Form("h_fail_pt%lu_eta%lu", pt_bin, eta_bin), Form("Failing probes (%s);tag & probe mass (GeV);Events / %1.1f (GeV)", bin_title.c_str(), m_mass_bin_width), num_mass_bins, m_mass_low, m_mass_high));
+                hc.Add(new TH1F(Form("h_pass_pt%lu_vs_eta%lu", pt_bin, eta_bin), Form("Passing probes (%s);tag & probe mass (GeV);Events / %1.1f (GeV)", bin_title.c_str(), m_mass_bin_width), num_mass_bins, m_mass_low, m_mass_high));
+                hc.Add(new TH1F(Form("h_fail_pt%lu_vs_eta%lu", pt_bin, eta_bin), Form("Failing probes (%s);tag & probe mass (GeV);Events / %1.1f (GeV)", bin_title.c_str(), m_mass_bin_width), num_mass_bins, m_mass_low, m_mass_high));
             }
         }
     }
@@ -263,8 +209,8 @@ void MassPlotLooper::BookHists()
             for (size_t phi_bin = 0; phi_bin != m_phi_bins.size()-1; phi_bin++)
             {
                 const std::string bin_title = Form("%1.2f < %s < %1.2f, %1.2f < %s < %1.2f", m_eta_bins[eta_bin], eta_title.c_str(), m_eta_bins[eta_bin+1], m_phi_bins[phi_bin], phi_title.c_str(), m_phi_bins[phi_bin+1]);
-                hc.Add(new TH1F(Form("h_pass_eta%lu_phi%lu", eta_bin, phi_bin), Form("Passing probes (%s);tag & probe mass (GeV);Events / %1.1f (GeV)", bin_title.c_str(), m_mass_bin_width), num_mass_bins, m_mass_low, m_mass_high));
-                hc.Add(new TH1F(Form("h_fail_eta%lu_phi%lu", eta_bin, phi_bin), Form("Failing probes (%s);tag & probe mass (GeV);Events / %1.1f (GeV)", bin_title.c_str(), m_mass_bin_width), num_mass_bins, m_mass_low, m_mass_high));
+                hc.Add(new TH1F(Form("h_pass_eta%lu_vs_phi%lu", eta_bin, phi_bin), Form("Passing probes (%s);tag & probe mass (GeV);Events / %1.1f (GeV)", bin_title.c_str(), m_mass_bin_width), num_mass_bins, m_mass_low, m_mass_high));
+                hc.Add(new TH1F(Form("h_fail_eta%lu_vs_phi%lu", eta_bin, phi_bin), Form("Failing probes (%s);tag & probe mass (GeV);Events / %1.1f (GeV)", bin_title.c_str(), m_mass_bin_width), num_mass_bins, m_mass_low, m_mass_high));
             }
         }
     }
@@ -418,12 +364,12 @@ int MassPlotLooper::Analyze(long long entry)
             if (m_verbose) {cout << "passes the numerator selection" << endl;}
 
             // fill hists
-            if (has_pt_bins                  ) {hc[Form("h_pass_pt%u", pt_bin)                 ]->Fill(mass, weight);}
-            if (has_eta_bins                 ) {hc[Form("h_pass_eta%u", eta_bin)               ]->Fill(mass, weight);}
-            if (has_phi_bins                 ) {hc[Form("h_pass_phi%u", phi_bin)               ]->Fill(mass, weight);}
-            if (has_nvtx_bins                ) {hc[Form("h_pass_nvtx%u", nvtx_bin)             ]->Fill(mass, weight);}
-            if (has_pt_bins and has_eta_bins ) {hc[Form("h_pass_pt%u_eta%u", pt_bin, eta_bin)  ]->Fill(mass, weight);}
-            if (has_eta_bins and has_phi_bins) {hc[Form("h_pass_eta%u_phi%u", eta_bin, phi_bin)]->Fill(mass, weight);}
+            if (has_pt_bins                  ) {hc[Form("h_pass_pt%u", pt_bin)                    ]->Fill(mass, weight);}
+            if (has_eta_bins                 ) {hc[Form("h_pass_eta%u", eta_bin)                  ]->Fill(mass, weight);}
+            if (has_phi_bins                 ) {hc[Form("h_pass_phi%u", phi_bin)                  ]->Fill(mass, weight);}
+            if (has_nvtx_bins                ) {hc[Form("h_pass_nvtx%u", nvtx_bin)                ]->Fill(mass, weight);}
+            if (has_pt_bins and has_eta_bins ) {hc[Form("h_pass_pt%u_vs_eta%u", pt_bin, eta_bin)  ]->Fill(mass, weight);}
+            if (has_eta_bins and has_phi_bins) {hc[Form("h_pass_eta%u_vs_phi%u", eta_bin, phi_bin)]->Fill(mass, weight);}
         }
         // fails the probe numerator 
         else
@@ -431,12 +377,12 @@ int MassPlotLooper::Analyze(long long entry)
             if (m_verbose) {cout << "fails the numerator selection" << endl;}
 
             // fill hists
-            if (has_pt_bins                  ) {hc[Form("h_fail_pt%u", pt_bin)                 ]->Fill(mass, weight);}
-            if (has_eta_bins                 ) {hc[Form("h_fail_eta%u", eta_bin)               ]->Fill(mass, weight);}
-            if (has_phi_bins                 ) {hc[Form("h_fail_phi%u", phi_bin)               ]->Fill(mass, weight);}
-            if (has_nvtx_bins                ) {hc[Form("h_fail_nvtx%u", nvtx_bin)             ]->Fill(mass, weight);}
-            if (has_pt_bins and has_eta_bins ) {hc[Form("h_fail_pt%u_eta%u", pt_bin, eta_bin)  ]->Fill(mass, weight);}
-            if (has_eta_bins and has_phi_bins) {hc[Form("h_fail_eta%u_phi%u", eta_bin, phi_bin)]->Fill(mass, weight);}
+            if (has_pt_bins                  ) {hc[Form("h_fail_pt%u", pt_bin)                    ]->Fill(mass, weight);}
+            if (has_eta_bins                 ) {hc[Form("h_fail_eta%u", eta_bin)                  ]->Fill(mass, weight);}
+            if (has_phi_bins                 ) {hc[Form("h_fail_phi%u", phi_bin)                  ]->Fill(mass, weight);}
+            if (has_nvtx_bins                ) {hc[Form("h_fail_nvtx%u", nvtx_bin)                ]->Fill(mass, weight);}
+            if (has_pt_bins and has_eta_bins ) {hc[Form("h_fail_pt%u_vs_eta%u", pt_bin, eta_bin)  ]->Fill(mass, weight);}
+            if (has_eta_bins and has_phi_bins) {hc[Form("h_fail_eta%u_vs_phi%u", eta_bin, phi_bin)]->Fill(mass, weight);}
         }
 
         // done
