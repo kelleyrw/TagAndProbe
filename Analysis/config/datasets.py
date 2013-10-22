@@ -38,7 +38,7 @@ dy_fast = cms.PSet(
 )
 
 ## muon triggered data 
-data_mu = cms.PSet(
+double_mu = cms.PSet(
 	name     = cms.string("data_double_mu"),
 	title    = cms.string("DoubleMu_Run2012"),
 	files    = cms.vstring([lepton_tree_path+'/DoubleMu_Run2012*/*.root']),
@@ -55,7 +55,7 @@ single_mu = cms.PSet(
 )
 
 ## electron triggered data 
-data_el = cms.PSet(
+double_el = cms.PSet(
 	name     = cms.string("data_double_el"),
 	title    = cms.string("DoubleElectron_Run2012"),
 	files    = cms.vstring([lepton_tree_path+'/DoubleElectron_Run2012*/*.root']),
