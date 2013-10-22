@@ -241,7 +241,7 @@ try
         // pt bins
         // ------------------------------------------------------ //
 
-        if (num_pt_bins > 0)
+        if (not pt_bins.empty())
         {
             TH1* h_num = new TH1F("h_num_pt", "Numerator Counts;p_{T} (GeV)"  , num_pt_bins, pt_bins.data());
             TH1* h_den = new TH1F("h_den_pt", "Denominator Counts;p_{T} (GeV)", num_pt_bins, pt_bins.data());
@@ -349,7 +349,7 @@ try
         // eta bins
         // ------------------------------------------------------ //
 
-        if (num_eta_bins > 0)
+        if (not eta_bins.empty())
         {
             TH1* h_num = new TH1F("h_num_eta", Form("Numerator Counts;%s"  , eta_title.c_str()), num_eta_bins, eta_bins.data());
             TH1* h_den = new TH1F("h_den_eta", Form("Denominator Counts;%s", eta_title.c_str()), num_eta_bins, eta_bins.data());
@@ -459,7 +459,7 @@ try
         // phi bins
         // ------------------------------------------------------ //
 
-        if (num_phi_bins > 0)
+        if (not phi_bins.empty())
         {
             TH1* h_num = new TH1F("h_num_phi", Form("Numerator Counts;%s"  , phi_title.c_str()), num_phi_bins, phi_bins.data());
             TH1* h_den = new TH1F("h_den_phi", Form("Denominator Counts;%s", phi_title.c_str()), num_phi_bins, phi_bins.data());
@@ -567,7 +567,7 @@ try
         // nvtx bins
         // ------------------------------------------------------ //
 
-        if (num_nvtx_bins > 0)
+        if (not nvtx_bins.empty())
         {
             TH1* h_num = new TH1F("h_num_nvtx", "Numerator Counts;# vertices"  , num_nvtx_bins, nvtx_bins.data());
             TH1* h_den = new TH1F("h_den_nvtx", "Denominator Counts;# vertices", num_nvtx_bins, nvtx_bins.data());
@@ -675,7 +675,7 @@ try
         // pt vs eta bins
         // ------------------------------------------------------ //
 
-        if (num_pt_bins > 0 and num_eta_bins > 0)
+        if (not (pt_bins.empty() or eta_bins.empty()))
         {
             TH1* h_num = new TH2F("h_num_pt_vs_eta", Form("Numerator Counts;%s;p_{T} (GeV)"  , eta_title.c_str()), num_eta_bins, eta_bins.data(), num_pt_bins, pt_bins.data());
             TH1* h_den = new TH2F("h_den_pt_vs_eta", Form("Denominator Counts;%s;p_{T} (GeV)", eta_title.c_str()), num_eta_bins, eta_bins.data(), num_pt_bins, pt_bins.data());
@@ -787,7 +787,7 @@ try
         // eta vs phi bins
         // ------------------------------------------------------ //
 
-        if (num_eta_bins > 0 and num_phi_bins > 0)
+        if (not (eta_bins.empty() or phi_bins.empty()))
         {
             TH1* h_num = new TH2F("h_num_eta_vs_phi", Form("Numerator Counts;%s;p_{T} (GeV)"  , phi_title.c_str()), num_phi_bins, phi_bins.data(), num_eta_bins, eta_bins.data());
             TH1* h_den = new TH2F("h_den_eta_vs_phi", Form("Denominator Counts;%s;p_{T} (GeV)", phi_title.c_str()), num_phi_bins, phi_bins.data(), num_eta_bins, eta_bins.data());

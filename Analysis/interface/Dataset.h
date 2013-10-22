@@ -18,6 +18,7 @@ namespace tnp
         Dataset
         (
              const std::string& name,
+             const std::string& title,
              const std::vector<std::string>& input_file_names,
              const std::string& run_list = "",
              const bool is_data = false
@@ -25,6 +26,7 @@ namespace tnp
 
         // members:
         std::string m_name;
+        std::string m_title;
         std::vector<std::string> m_input_file_names;
         std::string m_run_list;
         bool m_is_data;
