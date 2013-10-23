@@ -18,13 +18,13 @@ process = cms.PSet()
 from datasets import *
 
 ## ------------------------------------------------------------- #
-## Parameters for the comparison, plot making, and fitting 
+## Parameters for the comparison 
 ## ------------------------------------------------------------- #
 
-process.tnp_compare = cms.PSet(
+el_id = cms.PSet(
 	
 	## verbosity (for trouble shooting)
-	verbose = cms.bool(True),
+	verbose = cms.bool(False),
 
 	## label to give unique name
 	output_label = cms.string("compare"),
@@ -43,3 +43,28 @@ process.tnp_compare = cms.PSet(
 	## available options are: eps, png, pdf
 	suffix = cms.string("png"), 
 )
+
+mu_id = cms.PSet(
+	
+	## verbosity (for trouble shooting)
+	verbose = cms.bool(False),
+
+	## label to give unique name
+	output_label = cms.string("compare"),
+
+	## path to the efficiency results to compare 
+	eff_results_path = cms.string(analysis_path+"/plots/MuID_MuTightWP/muon/MuTightWPDenID_MuTightWPNum"),
+
+	## first result to compare
+	dataset1 = single_mu,
+
+	## second result to compare
+	dataset2 = dy_full,
+
+	## suffix to print the plots (before the fit)
+	## blank means do not print
+	## available options are: eps, png, pdf
+	suffix = cms.string("png"), 
+)
+
+process.tnp_compare = cms.VPSet(el_id, mu_id)
