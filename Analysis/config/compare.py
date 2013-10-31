@@ -21,6 +21,7 @@ from datasets import *
 ## Parameters for the comparison 
 ## ------------------------------------------------------------- #
 
+# electron ID comparison
 el_id = cms.PSet(
 	
 	## verbosity (for trouble shooting)
@@ -44,6 +45,7 @@ el_id = cms.PSet(
 	suffix = cms.string("png"), 
 )
 
+# muon ID comparison
 mu_id = cms.PSet(
 	
 	## verbosity (for trouble shooting)
@@ -67,4 +69,5 @@ mu_id = cms.PSet(
 	suffix = cms.string("png"), 
 )
 
+# a vector of all the comparison PSets --> will do them all.
 process.tnp_compare = cms.VPSet(el_id, mu_id)
