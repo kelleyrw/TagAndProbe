@@ -696,6 +696,11 @@ try
                         tnp::Model::value_type sig_fail_model = pt_vs_eta_models[pt_bin][eta_bin][1];
                         tnp::Model::value_type bkg_pass_model = pt_vs_eta_models[pt_bin][eta_bin][2];
                         tnp::Model::value_type bkg_fail_model = pt_vs_eta_models[pt_bin][eta_bin][3];
+                        cout << Form("fitting bins: pt %lu, eta %lu ", pt_bin, eta_bin) << endl; 
+                        cout << "sig pass model = " << tnp::GetStringFromModel(sig_pass_model) << endl; 
+                        cout << "sig fail model = " << tnp::GetStringFromModel(sig_fail_model) << endl; 
+                        cout << "bkg pass model = " << tnp::GetStringFromModel(bkg_pass_model) << endl; 
+                        cout << "bkg fail model = " << tnp::GetStringFromModel(bkg_fail_model) << endl; 
 
                         TH1* const h_pass = hc_mass[Form("h_pass_pt%lu_vs_eta%lu", pt_bin, eta_bin)];
                         TH1* const h_fail = hc_mass[Form("h_fail_pt%lu_vs_eta%lu", pt_bin, eta_bin)];
@@ -720,7 +725,6 @@ try
                              h_pass_template,
                              h_fail_template
                         );
-
                     }
                     else
                     {
