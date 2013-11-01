@@ -243,8 +243,8 @@ try
         // 1D: eff(pt)
         if (std::find(eff_names.begin(), eff_names.end(), std::string("h_eff_pt")) != eff_names.end())
         {
-            dataset1_eff_tables.push_back(rt::CreateTableFromHist(hc1  ["h_eff_pt"], "Efficiency vs $p_{T}$"  , "$p_{T}$", "", "GeV", "", "1.2", "1.0", "1.0", false));
-            dataset2_eff_tables.push_back(rt::CreateTableFromHist(hc2  ["h_eff_pt"], "Efficiency vs $p_{T}$"  , "$p_{T}$", "", "GeV", "", "1.2", "1.0", "1.0", false));
+            dataset1_eff_tables.push_back(rt::CreateTableFromHist(hc1  ["h_eff_pt"], Form("%s Efficiency vs $p_{T}$", dataset1.m_title.c_str()), "$p_{T}$", "", "GeV", "", "1.2", "1.0", "1.0", false));
+            dataset2_eff_tables.push_back(rt::CreateTableFromHist(hc2  ["h_eff_pt"], Form("%s Efficiency vs $p_{T}$", dataset2.m_title.c_str()), "$p_{T}$", "", "GeV", "", "1.2", "1.0", "1.0", false));
             scale_factor_tables.push_back(rt::CreateTableFromHist(hc_sf["h_sf_pt" ], "Scale Factor vs $p_{T}$", "$p_{T}$", "", "GeV", "", "1.2", "1.0", "1.0", false));
             compare_plots.push_back(CreateEfficienyPlot1D(hc1["h_eff_pt"], hc2["h_eff_pt"], hc_sf["h_sf_pt"], "Efficiency vs p_{T};p_{T} (GeV); Efficiency", dataset1.m_title, dataset2.m_title));
         }
@@ -252,8 +252,8 @@ try
         // 1D: eff(eta)
         if (std::find(eff_names.begin(), eff_names.end(), std::string("h_eff_eta")) != eff_names.end())
         {
-            dataset1_eff_tables.push_back(rt::CreateTableFromHist(hc1  ["h_eff_eta"], "Efficiency vs $\\eta$"  , "$\\eta$", "", "", "", "1.2", "1.2", "1.0", false));
-            dataset2_eff_tables.push_back(rt::CreateTableFromHist(hc2  ["h_eff_eta"], "Efficiency vs $\\eta$"  , "$\\eta$", "", "", "", "1.2", "1.2", "1.0", false));
+            dataset1_eff_tables.push_back(rt::CreateTableFromHist(hc1  ["h_eff_eta"], Form("%s Efficiency vs $\\eta$", dataset1.m_title.c_str()), "$\\eta$", "", "", "", "1.2", "1.2", "1.0", false));
+            dataset2_eff_tables.push_back(rt::CreateTableFromHist(hc2  ["h_eff_eta"], Form("%s Efficiency vs $\\eta$", dataset2.m_title.c_str()), "$\\eta$", "", "", "", "1.2", "1.2", "1.0", false));
             scale_factor_tables.push_back(rt::CreateTableFromHist(hc_sf["h_sf_eta" ], "Scale Factor vs $\\eta$", "$\\eta$", "", "", "", "1.2", "1.2", "1.0", false));
             compare_plots.push_back(CreateEfficienyPlot1D(hc1["h_eff_eta"], hc2["h_eff_eta"], hc_sf["h_sf_eta"], "Efficiency vs #eta;#eta; Efficiency", dataset1.m_title, dataset2.m_title));
         }
@@ -261,8 +261,8 @@ try
         // 1D: eff(phi)
         if (std::find(eff_names.begin(), eff_names.end(), std::string("h_eff_phi")) != eff_names.end())
         {
-            dataset1_eff_tables.push_back(rt::CreateTableFromHist(hc1  ["h_eff_phi"], "Efficiency vs $\\phi$"  , "$\\phi$", "", "", "", "1.2", "1.2", "1.0", false));
-            dataset2_eff_tables.push_back(rt::CreateTableFromHist(hc2  ["h_eff_phi"], "Efficiency vs $\\phi$"  , "$\\phi$", "", "", "", "1.2", "1.2", "1.0", false));
+            dataset1_eff_tables.push_back(rt::CreateTableFromHist(hc1  ["h_eff_phi"], Form("%s Efficiency vs $\\phi$", dataset1.m_title.c_str()), "$\\phi$", "", "", "", "1.2", "1.2", "1.0", false));
+            dataset2_eff_tables.push_back(rt::CreateTableFromHist(hc2  ["h_eff_phi"], Form("%s Efficiency vs $\\phi$", dataset2.m_title.c_str()), "$\\phi$", "", "", "", "1.2", "1.2", "1.0", false));
             scale_factor_tables.push_back(rt::CreateTableFromHist(hc_sf["h_sf_phi" ], "Scale Factor vs $\\phi$", "$\\phi$", "", "", "", "1.2", "1.2", "1.0", false));
             compare_plots.push_back(CreateEfficienyPlot1D(hc1["h_eff_phi"], hc2["h_eff_phi"], hc_sf["h_sf_phi"], "Efficiency vs #phi;#phi; Efficiency", dataset1.m_title, dataset2.m_title));
         }
@@ -270,8 +270,8 @@ try
         // 1D: eff(nvtx)
         if (std::find(eff_names.begin(), eff_names.end(), std::string("h_eff_nvtx")) != eff_names.end())
         {
-            dataset1_eff_tables.push_back(rt::CreateTableFromHist(hc1  ["h_eff_nvtx"], "Efficiency vs \\# vertices"  , "\\# vertices", "", "", "", "1.2", "1.0", "1.0", false));
-            dataset2_eff_tables.push_back(rt::CreateTableFromHist(hc2  ["h_eff_nvtx"], "Efficiency vs \\# vertices"  , "\\# vertices", "", "", "", "1.2", "1.0", "1.0", false));
+            dataset1_eff_tables.push_back(rt::CreateTableFromHist(hc1  ["h_eff_nvtx"], Form("%s Efficiency vs \\# vertices", dataset1.m_title.c_str()), "\\# vertices", "", "", "", "1.2", "1.0", "1.0", false));
+            dataset2_eff_tables.push_back(rt::CreateTableFromHist(hc2  ["h_eff_nvtx"], Form("%s Efficiency vs \\# vertices", dataset2.m_title.c_str()), "\\# vertices", "", "", "", "1.2", "1.0", "1.0", false));
             scale_factor_tables.push_back(rt::CreateTableFromHist(hc_sf["h_sf_nvtx" ], "Scale Factor vs \\# vertices", "\\# vertices", "", "", "", "1.2", "1.0", "1.0", false));
             compare_plots.push_back(CreateEfficienyPlot1D(hc1["h_eff_nvtx"], hc2["h_eff_nvtx"], hc_sf["h_sf_nvtx"], "Efficiency vs # vertices;# vertices; Efficiency", dataset1.m_title, dataset2.m_title));
         }
@@ -279,8 +279,8 @@ try
         // 2D: eff(pt, eta)
         if (std::find(eff_names.begin(), eff_names.end(), std::string("h_eff_pt_vs_eta")) != eff_names.end())
         {
-            dataset1_eff_tables.push_back(rt::CreateTableFromHist(hc1  ["h_eff_pt_vs_eta"], "Efficiency vs $p_{T}$ and $\\eta$"  , "$p_{T}$", "$\\eta$", "", "", "1.2", "1.0", "1.2", true));
-            dataset2_eff_tables.push_back(rt::CreateTableFromHist(hc2  ["h_eff_pt_vs_eta"], "Efficiency vs $p_{T}$ and $\\eta$"  , "$p_{T}$", "$\\eta$", "", "", "1.2", "1.0", "1.2", true));
+            dataset1_eff_tables.push_back(rt::CreateTableFromHist(hc1  ["h_eff_pt_vs_eta"], Form("%s Efficiency vs $p_{T}$ and $\\eta$", dataset1.m_title.c_str()), "$p_{T}$", "$\\eta$", "", "", "1.2", "1.0", "1.2", true));
+            dataset2_eff_tables.push_back(rt::CreateTableFromHist(hc2  ["h_eff_pt_vs_eta"], Form("%s Efficiency vs $p_{T}$ and $\\eta$", dataset2.m_title.c_str()), "$p_{T}$", "$\\eta$", "", "", "1.2", "1.0", "1.2", true));
             scale_factor_tables.push_back(rt::CreateTableFromHist(hc_sf["h_sf_pt_vs_eta" ], "Scale Factor vs $p_{T}$ and $\\eta$", "$p_{T}$", "$\\eta$", "", "", "1.2", "1.0", "1.2", true));
             compare_plots.push_back(CreateScaleFactorPlot2D(hc_sf["h_sf_pt_vs_eta"], "Scale Factor vs p_{T} and #eta;#eta;p_{T} (GeV);Efficiency", dataset1.m_title, dataset2.m_title, "colz"));
         }
@@ -288,8 +288,8 @@ try
         // 2D: eff(eta, phi)
         if (std::find(eff_names.begin(), eff_names.end(), std::string("h_eff_eta_vs_phi")) != eff_names.end())
         {
-            dataset1_eff_tables.push_back(rt::CreateTableFromHist(hc1  ["h_eff_eta_vs_phi"], "Efficiency vs $\\eta$ and $\\phi$"  , "$\\eta$", "$\\phi$", "", "", "1.2", "1.2", "1.2", true));
-            dataset2_eff_tables.push_back(rt::CreateTableFromHist(hc2  ["h_eff_eta_vs_phi"], "Efficiency vs $\\eta$ and $\\phi$"  , "$\\eta$", "$\\phi$", "", "", "1.2", "1.2", "1.2", true));
+            dataset1_eff_tables.push_back(rt::CreateTableFromHist(hc1  ["h_eff_eta_vs_phi"], Form("%s Efficiency vs $\\eta$ and $\\phi$", dataset1.m_title.c_str()), "$\\eta$", "$\\phi$", "", "", "1.2", "1.2", "1.2", true));
+            dataset2_eff_tables.push_back(rt::CreateTableFromHist(hc2  ["h_eff_eta_vs_phi"], Form("%s Efficiency vs $\\eta$ and $\\phi$", dataset2.m_title.c_str()), "$\\eta$", "$\\phi$", "", "", "1.2", "1.2", "1.2", true));
             scale_factor_tables.push_back(rt::CreateTableFromHist(hc_sf["h_sf_eta_vs_phi" ], "Scale Factor vs $\\eta$ and $\\phi$", "$\\eta$", "$\\phi$", "", "", "1.2", "1.2", "1.2", true));
             compare_plots.push_back(CreateScaleFactorPlot2D(hc_sf["h_sf_eta_vs_phi"], "Scale Factor vs #eta and #phi;#phi;#eta;Efficiency", dataset1.m_title, dataset2.m_title, "colz"));
         }
@@ -332,6 +332,9 @@ try
                 compare_plots.at(i)->Print(Form("%s/%s.%s", output_plot_path.c_str(), compare_plots.at(i)->GetName(), suffix.c_str())); 
             }
         }
+
+        // cleanup
+        lt::delete_container(compare_plots);
 
     } // end tnp_cfgs loop
 

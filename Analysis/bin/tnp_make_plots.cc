@@ -299,8 +299,8 @@ int MassPlotLooper::Analyze(long long entry)
         // check pt boundaries
         const bool has_pt_bins = m_pt_bins.size() >= 2;
         const float probe_pt   = probe().pt();
-        const float pt_min     = (m_pt_bins.empty() ? 999999.0 : m_pt_bins.front());
-        const float pt_max     = (m_pt_bins.empty() ? 999999.0 : m_pt_bins.back() );
+        const float pt_min     = (not has_pt_bins ? 999999.0  : m_pt_bins.front());
+        const float pt_max     = (not has_pt_bins ? -999999.0 : m_pt_bins.back() );
         if (has_pt_bins and not (pt_min < probe_pt && probe_pt < pt_max))
         {
             if (m_verbose) {cout << "outside pt bins" << endl;}
@@ -309,9 +309,10 @@ int MassPlotLooper::Analyze(long long entry)
 
         // check eta boundaries
         const bool has_eta_bins = m_eta_bins.size() >= 2;
-        const float probe_eta   = fabs(is_el ? sceta() : probe().eta());
-        const float eta_min     = (m_eta_bins.empty() ? 999999.0 : m_eta_bins.front());
-        const float eta_max     = (m_eta_bins.empty() ? 999999.0 : m_eta_bins.back() );
+        const float eta_min     = (not has_eta_bins ? 999999.0  : m_eta_bins.front());
+        const float eta_max     = (not has_eta_bins ? -999999.0 : m_eta_bins.back() );
+        const float use_abs_eta = (eta_min >= 0);
+        const float probe_eta   = use_abs_eta ? fabs(is_el ? sceta() : probe().eta()) : (is_el ? sceta() : probe().eta());
         if (has_eta_bins and not (eta_min < probe_eta && probe_eta < eta_max))
         {
             if (m_verbose) {cout << "outside eta bins" << endl;}
@@ -320,9 +321,10 @@ int MassPlotLooper::Analyze(long long entry)
 
         // check phi boundaries
         const bool has_phi_bins = m_phi_bins.size() >= 2;
-        const float probe_phi   = probe().phi();
-        const float phi_min     = (m_phi_bins.empty() ? 999999.0 : m_phi_bins.front());
-        const float phi_max     = (m_phi_bins.empty() ? 999999.0 : m_phi_bins.back() );
+        const float phi_min     = (not has_phi_bins ? 999999.0  : m_phi_bins.front());
+        const float phi_max     = (not has_phi_bins ? -999999.0 : m_phi_bins.back() );
+        const float use_abs_phi = (phi_min >= 0);
+        const float probe_phi   = use_abs_phi ? fabs(probe().phi()) : probe().phi();
         if (has_phi_bins and not (phi_min < probe_phi && probe_phi < phi_max))
         {
             if (m_verbose) {cout << "outside phi bins" << endl;}
@@ -332,8 +334,8 @@ int MassPlotLooper::Analyze(long long entry)
         // check the nvtxs boundaries
         const bool has_nvtx_bins = m_nvtx_bins.size() >= 2;
         const float nvtxs        = nvtx();
-        const float nvtx_min     = (m_nvtx_bins.empty() ? 999999.0 : m_nvtx_bins.front());
-        const float nvtx_max     = (m_nvtx_bins.empty() ? 999999.0 : m_nvtx_bins.back() );
+        const float nvtx_min     = (not has_nvtx_bins ? 999999.0  : m_nvtx_bins.front());
+        const float nvtx_max     = (not has_nvtx_bins ? -999999.0 : m_nvtx_bins.back() );
         if (has_nvtx_bins and not (nvtx_min < nvtxs && nvtxs < nvtx_max))
         {
             if (m_verbose) {cout << "outside nvtx bins" << endl;}
