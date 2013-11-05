@@ -63,6 +63,9 @@ namespace tnp
             const double background_err
         );
 
+        // destroy:
+        ~Result();
+
         // members:
         value_t eff;
         value_t num;

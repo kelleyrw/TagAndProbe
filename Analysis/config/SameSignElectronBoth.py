@@ -53,8 +53,7 @@ tnp_parameters = cms.PSet(
 	mass_bin_width = cms.double(2.0),   # GeV
 	
 	# datasets to run on
-# 	datasets = cms.VPSet(dy_full, single_el),
-	datasets = cms.VPSet(single_el),
+	datasets = cms.VPSet(dy_full, single_el),
 
 	## bins for the observables
 	## supported pt, eta, phi, and # vertices
@@ -130,13 +129,13 @@ tnp_parameters = cms.PSet(
 		"BreitWignerCB", "MCTemplate"   , "Exponential", "Exponential", # eta1, pt1
 		"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # eta2, pt1 # crack electrons (1.4442 < |eta| < 1.566)
 		"BreitWignerCB", "MCTemplate"   , "Exponential", "Exponential", # eta3, pt1
-		"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential"  # eta4, pt1
+		"BreitWignerCB", "MCTemplate"   , "Exponential", "Exponential"  # eta4, pt1
 	,                                                                 
 		"BreitWignerCB", "MCTemplate"   , "ErfExp"     , "ErfExp"     , # eta0, pt2
 		"BreitWignerCB", "MCTemplate"   , "ErfExp"     , "ErfExp"     , # eta1, pt2 
 		"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"     , # eta2, pt2 # crack electrons (1.4442 < |eta| < 1.566)
-		"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"     , # eta3, pt2
-		"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"       # eta4, pt2
+		"BreitWignerCB", "MCTemplate"   , "Exponential", "ErfExp"     , # eta3, pt2
+		"BreitWignerCB", "MCTemplate"   , "Exponential", "ErfExp"       # eta4, pt2
 	,                                                                 
 		"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"     , # eta0, pt3
 		"MCTemplate"   , "MCTemplate"   , "Poly3"      , "Poly3"      , # eta1, pt3

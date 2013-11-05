@@ -703,6 +703,13 @@ namespace tnp
         bkg.error = -999999.0;
     }
 
+    Result::~Result()
+    {
+        // fixme: not working quite right
+        //delete cpass;
+        //delete cfail;
+    }
+
     std::string Result::eff_str() const
     {
         return lt::pm(eff.value, eff.value, "1.3");
@@ -928,6 +935,12 @@ namespace tnp
                       ( "total_fail"  , int_nfail_tot.value, int_nfail_tot.error)
                       ( "eff"         , int_data_eff.value , int_data_eff.error );
         t2.print();
+
+        // cleanup
+        delete spass_model_ptr;
+        delete sfail_model_ptr;
+        delete bpass_model_ptr;
+        delete bfail_model_ptr;
 
         // done 
         return simple_result;

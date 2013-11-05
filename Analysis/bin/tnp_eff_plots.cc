@@ -689,6 +689,12 @@ try
             {
                 for (size_t eta_bin = 0; eta_bin != num_eta_bins; eta_bin++)
                 {
+//                     if (not (pt_bin == 4 and eta_bin == 3)) {continue;}
+//                     if (not (eta_bin == 3)) {continue;}
+//                     if (not (pt_bin == 4)) {continue;}
+//                     if (not ((pt_bin==0 or pt_bin==1 or pt_bin==2 or pt_bin==3 or pt_bin==4 or pt_bin==5) and eta_bin == 3)) {continue;}
+                    if (not ((eta_bin==3 or eta_bin==2) and pt_bin == 4)) {continue;}
+
                     tnp::Result result;
                     if (dataset.m_is_data)
                     {
