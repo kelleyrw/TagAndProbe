@@ -10,7 +10,14 @@
 //
 //void TestSingleFit()
 {
-    gSystem->Load("$CMSSW_BASE/lib/$SCRAM_ARCH/libTagAndProbeAnalysis.dylib");
+    if (TString(gSystem->Getenv("SCRAM_ARCH")).Contains("osx"))
+    {
+        gSystem->Load("$CMSSW_BASE/lib/$SCRAM_ARCH/libTagAndProbeAnalysis.dylib");
+    }
+    else
+    {
+        gSystem->Load("$CMSSW_BASE/lib/$SCRAM_ARCH/libTagAndProbeAnalysis.so");
+    }
 
     const float pt_bins[]  = {10, 15, 20, 30, 40, 50, 200};
     const size_t num_pt_bins = 6;
@@ -24,7 +31,7 @@
     {
         for (size_t eta_bin = 0; eta_bin != num_eta_bins; eta_bin++)
         {
-            if (!((eta_bin==3 || eta_bin==1) && pt_bin == 4)) {continue;}
+            if (!((eta_bin==3 || eta_bin==2) && pt_bin == 4)) {continue;}
             
             rt::TH1Container hc("plots/SameSign/electron/SameSignDenBoth_SameSignNum/data_single_el.root");
             TH1* h_pass = hc[Form("h_pass_pt%lu_vs_eta%lu", pt_bin, eta_bin)];

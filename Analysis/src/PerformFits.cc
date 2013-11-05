@@ -257,7 +257,6 @@ namespace tnp
         LinearExpPdf(RooRealVar &x, const std::string& label);
         RooRealVar *a0;
         RooRealVar *a1;
-        //RooRealVar *c;
         RooRealVar *t;
         RooExponential *exp;
         RooPolynomial *poly;
@@ -269,11 +268,9 @@ namespace tnp
     {
         a0 = new RooRealVar(Form("a0%s", l.c_str()), Form("a0%s", l.c_str()), 0);
         a1 = new RooRealVar(Form("a1%s", l.c_str()), Form("a1%s", l.c_str()), 0.5, 0.10, 10);
-        //c  = new RooRealVar(Form("c%s" , l.c_str()), Form("c %s", l.c_str()), 0);
         t  = new RooRealVar(Form("t%s" , l.c_str()), Form("t%s" , l.c_str()), -0.05, -100.00, 0.0);
  
         a0->setConstant(true);
-        //c->setConstant(true);
 
         string title = Form("exp%s", l.c_str()); 
         exp = new RooExponential(title.c_str(), title.c_str(), x, *t);
@@ -284,9 +281,6 @@ namespace tnp
         title = Form("polyexp%s", l.c_str());
         polyexp = new RooProdPdf(title.c_str(), title.c_str(), RooArgList(*poly, *exp));
         model = RooAbsPdfPtr(polyexp);
-
-//         title = Form("background%s", l.c_str());
-//         model = RooAbsPdfPtr(new RooAddPdf(title.c_str(), title.c_str(), *polyexp, *c));
     }
 
     // Quadratic * exp
@@ -343,7 +337,6 @@ namespace tnp
         a1 = new RooRealVar(Form("a1%s", l.c_str()), Form("a1%s", l.c_str()), 0.0);
         a2 = new RooRealVar(Form("a2%s", l.c_str()), Form("a2%s", l.c_str()), 0.0);
         a3 = new RooRealVar(Form("a3%s", l.c_str()), Form("a3%s", l.c_str()), 0.0);
-        //t  = new RooRealVar(Form("t%s" , l.c_str()), Form("t%s" , l.c_str()), -1e-6, -10.0, 0.00);
         t  = new RooRealVar(Form("t%s" , l.c_str()), Form("t%s" , l.c_str()), -0.05, -10.00, 0.0);
 
         // (a0 + a1*x + a2*x^2 + a3*x^3 + a4*x^4) * exp{-t}
@@ -780,14 +773,14 @@ namespace tnp
         sample.defineType("fail",2);
 
         // signal model (need ptr for polymorphism to work -- references for convenience)
-        PdfBase* spass_model_ptr = CreateModelPdf(sig_pass_model, mass, "_pass", h_pass_template);
-        PdfBase* sfail_model_ptr = CreateModelPdf(sig_fail_model, mass, "_fail", h_fail_template);
+        PdfBase* spass_model_ptr = CreateModelPdf(sig_pass_model, mass, lt::string_replace_all(h_pass->GetName(), "h_", "_sig_"), h_pass_template);
+        PdfBase* sfail_model_ptr = CreateModelPdf(sig_fail_model, mass, lt::string_replace_all(h_fail->GetName(), "h_", "_sig_"), h_fail_template);
         RooAbsPdf& spass_model   = *(spass_model_ptr->model);
         RooAbsPdf& sfail_model   = *(sfail_model_ptr->model);
 
         // background model (need ptr for polymorphism to work -- references for convenience)
-        PdfBase* bpass_model_ptr = CreateModelPdf(bkg_pass_model, mass, "_pass");
-        PdfBase* bfail_model_ptr = CreateModelPdf(bkg_fail_model, mass, "_fail");
+        PdfBase* bpass_model_ptr = CreateModelPdf(bkg_pass_model, mass, lt::string_replace_all(h_pass->GetName(), "h_", "_bkg_"));
+        PdfBase* bfail_model_ptr = CreateModelPdf(bkg_fail_model, mass, lt::string_replace_all(h_fail->GetName(), "h_", "_bkg_"));
         RooAbsPdf& bpass_model   = *(bpass_model_ptr->model);
         RooAbsPdf& bfail_model   = *(bfail_model_ptr->model);
 
@@ -935,12 +928,6 @@ namespace tnp
                       ( "total_fail"  , int_nfail_tot.value, int_nfail_tot.error)
                       ( "eff"         , int_data_eff.value , int_data_eff.error );
         t2.print();
-
-        // cleanup
-        delete spass_model_ptr;
-        delete sfail_model_ptr;
-        delete bpass_model_ptr;
-        delete bfail_model_ptr;
 
         // done 
         return simple_result;

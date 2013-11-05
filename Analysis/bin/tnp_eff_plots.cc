@@ -238,440 +238,460 @@ try
         // book efficiency hists 
         rt::TH1Container hc;
 
-//        // pt bins
-//        // ------------------------------------------------------ //
-//
-//        if (not pt_bins.empty())
-//        {
-//            TH1* h_num = new TH1F("h_num_pt", "Numerator Counts;p_{T} (GeV)"  , num_pt_bins, pt_bins.data());
-//            TH1* h_den = new TH1F("h_den_pt", "Denominator Counts;p_{T} (GeV)", num_pt_bins, pt_bins.data());
-//            TH1* h_eff = new TH1F("h_eff_pt", "Efficiency;p_{T} (GeV)"        , num_pt_bins, pt_bins.data());
-//            h_eff->GetYaxis()->SetRangeUser(0, 1.1);
-//
-//            // models
-//            const ModelArray2D pt_models = GetModelArrayFromVString(tnp_cfg.getParameter<std::vector<std::string> >("pt_models"), pt_bins); 
-//
-//            for (size_t pt_bin = 0; pt_bin != num_pt_bins; pt_bin++)
-//            {
-//                tnp::Result result;
-//                if (dataset.m_is_data)
-//                {
-//                    tnp::Model::value_type sig_pass_model = pt_models[pt_bin][0];
-//                    tnp::Model::value_type sig_fail_model = pt_models[pt_bin][1];
-//                    tnp::Model::value_type bkg_pass_model = pt_models[pt_bin][2];
-//                    tnp::Model::value_type bkg_fail_model = pt_models[pt_bin][3];
-//
-//                    TH1* const h_pass = hc_mass[Form("h_pass_pt%lu", pt_bin)];
-//                    TH1* const h_fail = hc_mass[Form("h_fail_pt%lu", pt_bin)];
-//
-//                    TH1* const h_pass_template = hc_template[Form("h_pass_pt%lu", pt_bin)];
-//                    TH1* const h_fail_template = hc_template[Form("h_fail_pt%lu", pt_bin)];
-//
-//                    // do the fit
-//                    result = PerformSimultaneousFit
-//                    (
-//                         sig_pass_model, 
-//                         sig_fail_model, 
-//                         bkg_pass_model, 
-//                         bkg_fail_model, 
-//                         h_pass, 
-//                         h_fail,
-//                         mass_low,
-//                         mass_high,
-//                         mass_bin_width,
-//                         /*a_bin_label = */Form("%1.0f GeV < p_{T} < %1.0f GeV", pt_bins[pt_bin], pt_bins[pt_bin+1]), 
-//                         /*b_bin_label = */"", 
-//                         h_pass_template,
-//                         h_fail_template
-//                    );
-//
-//                }
-//                else
-//                {
-//                    TH1* const h_pass = hc_mass[Form("h_pass_pt%lu", pt_bin)];
-//                    TH1* const h_fail = hc_mass[Form("h_fail_pt%lu", pt_bin)];
-//
-//                    // do the count
-//                    result = tnp::PerformSimpleCount
-//                    (
-//                         h_pass, 
-//                         h_fail,
-//                         mass_low,
-//                         mass_high,
-//                         mass_bin_width,
-//                         /*a_bin_label = */Form("%1.0f GeV < p_{T} < %1.0f GeV", pt_bins[pt_bin], pt_bins[pt_bin+1]), 
-//                         /*b_bin_label = */"" 
-//                    );
-//
-//                }
-//
-//                // check for nan
-//                if (std::isnan(result.num.value)) {result.num.value = 0.0;}
-//                if (std::isnan(result.num.error)) {result.num.error = 0.0;}
-//                if (std::isnan(result.den.value)) {result.den.value = 0.0;}
-//                if (std::isnan(result.den.error)) {result.den.error = 0.0;}
-//                if (std::isnan(result.eff.value)) {result.eff.value = 0.0;}
-//                if (std::isnan(result.eff.error)) {result.eff.error = 0.0;}
-//
-//                // record output to histogram
-//                h_num->SetBinContent(pt_bin+1, std::max(result.num.value, 0.0));
-//                h_num->SetBinError  (pt_bin+1, std::max(result.num.error, 0.0));
-//                h_den->SetBinContent(pt_bin+1, std::max(result.den.value, 0.0));
-//                h_den->SetBinError  (pt_bin+1, std::max(result.den.error, 0.0));
-//                h_eff->SetBinContent(pt_bin+1, std::max(result.eff.value, 0.0));
-//                h_eff->SetBinError  (pt_bin+1, std::max(result.eff.error, 0.0));
-//
-//                // print the fit plot
-//                if (not suffix.empty())
-//                {
-//                    const std::string fit_plot_pass_name = Form("%s/plots/%s/%s/%s_%s/%s_eff/p_pass_pt%lu",
-//                        analysis_path.c_str(),
-//                        output_label.c_str(),
-//                        GetStringFromLepton(lepton_type).c_str(),
-//                        GetStringFromSelection(den_selection).c_str(),
-//                        GetStringFromSelection(num_selection).c_str(),
-//                        dataset.m_name.c_str(),
-//                        pt_bin
-//                    );
-//                    const std::string fit_plot_fail_name = lt::string_replace_last(fit_plot_pass_name, "pass", "fail"); 
-//
-//                    PrintCanvas(result.cpass, fit_plot_pass_name, suffix);
-//                    PrintCanvas(result.cfail, fit_plot_fail_name, suffix);
-//                }
-//            }
-//
-//            // add histograms to hist container
-//            hc.Add(h_num);
-//            hc.Add(h_den);
-//            hc.Add(h_eff);
-//        }
-//
-//        // eta bins
-//        // ------------------------------------------------------ //
-//
-//        if (not eta_bins.empty())
-//        {
-//            TH1* h_num = new TH1F("h_num_eta", Form("Numerator Counts;%s"  , eta_title.c_str()), num_eta_bins, eta_bins.data());
-//            TH1* h_den = new TH1F("h_den_eta", Form("Denominator Counts;%s", eta_title.c_str()), num_eta_bins, eta_bins.data());
-//            TH1* h_eff = new TH1F("h_eff_eta", Form("Efficiency;%s"        , eta_title.c_str()), num_eta_bins, eta_bins.data());
-//            h_eff->GetYaxis()->SetRangeUser(0, 1.1);
-//
-//            // models
-//            const ModelArray2D eta_models = GetModelArrayFromVString(tnp_cfg.getParameter<std::vector<std::string> >("eta_models"), eta_bins); 
-//
-//            for (size_t eta_bin = 0; eta_bin != num_eta_bins; eta_bin++)
-//            {
-//                tnp::Result result;
-//                if (dataset.m_is_data)
-//                {
-//                    tnp::Model::value_type sig_pass_model = eta_models[eta_bin][0];
-//                    tnp::Model::value_type sig_fail_model = eta_models[eta_bin][1];
-//                    tnp::Model::value_type bkg_pass_model = eta_models[eta_bin][2];
-//                    tnp::Model::value_type bkg_fail_model = eta_models[eta_bin][3];
-//
-//                    TH1* const h_pass = hc_mass[Form("h_pass_eta%lu", eta_bin)];
-//                    TH1* const h_fail = hc_mass[Form("h_fail_eta%lu", eta_bin)];
-//
-//                    TH1* const h_pass_template = hc_template[Form("h_pass_eta%lu", eta_bin)];
-//                    TH1* const h_fail_template = hc_template[Form("h_fail_eta%lu", eta_bin)];
-//
-//                    // do the fit
-//                    result = PerformSimultaneousFit
-//                    (
-//                         sig_pass_model, 
-//                         sig_fail_model, 
-//                         bkg_pass_model, 
-//                         bkg_fail_model, 
-//                         h_pass, 
-//                         h_fail,
-//                         mass_low,
-//                         mass_high,
-//                         mass_bin_width,
-//                         /*a_bin_label = */Form("%1.2f < %s < %1.2f", eta_bins[eta_bin], eta_title.c_str(), eta_bins[eta_bin+1]), 
-//                         /*b_bin_label = */"", 
-//                         h_pass_template,
-//                         h_fail_template
-//                    );
-//
-//                }
-//                else
-//                {
-//                    TH1* const h_pass = hc_mass[Form("h_pass_eta%lu", eta_bin)];
-//                    TH1* const h_fail = hc_mass[Form("h_fail_eta%lu", eta_bin)];
-//
-//                    // do the count
-//                    result = tnp::PerformSimpleCount
-//                    (
-//                         h_pass, 
-//                         h_fail,
-//                         mass_low,
-//                         mass_high,
-//                         mass_bin_width,
-//                         /*a_bin_label = */Form("%1.2f < %s < %1.2f", eta_bins[eta_bin], eta_title.c_str(), eta_bins[eta_bin+1]), 
-//                         /*b_bin_label = */"" 
-//                    );
-//
-//                }
-//
-//                // check for nan
-//                if (std::isnan(result.num.value)) {result.num.value = 0.0;}
-//                if (std::isnan(result.num.error)) {result.num.error = 0.0;}
-//                if (std::isnan(result.den.value)) {result.den.value = 0.0;}
-//                if (std::isnan(result.den.error)) {result.den.error = 0.0;}
-//                if (std::isnan(result.eff.value)) {result.eff.value = 0.0;}
-//                if (std::isnan(result.eff.error)) {result.eff.error = 0.0;}
-//
-//                // record output to histogram
-//                cout << "result.num = " << result.num_str() << endl;
-//                cout << "result.den = " << result.den_str() << endl;
-//                h_num->SetBinContent(eta_bin+1, std::max(result.num.value, 0.0));
-//                h_num->SetBinError  (eta_bin+1, std::max(result.num.error, 0.0));
-//                h_den->SetBinContent(eta_bin+1, std::max(result.den.value, 0.0));
-//                h_den->SetBinError  (eta_bin+1, std::max(result.den.error, 0.0));
-//                h_eff->SetBinContent(eta_bin+1, std::max(result.eff.value, 0.0));
-//                h_eff->SetBinError  (eta_bin+1, std::max(result.eff.error, 0.0));
-//
-//                // print the fit plot
-//                if (not suffix.empty())
-//                {
-//                    const std::string fit_plot_pass_name = Form("%s/plots/%s/%s/%s_%s/%s_eff/p_pass_eta%lu",
-//                        analysis_path.c_str(),
-//                        output_label.c_str(),
-//                        GetStringFromLepton(lepton_type).c_str(),
-//                        GetStringFromSelection(den_selection).c_str(),
-//                        GetStringFromSelection(num_selection).c_str(),
-//                        dataset.m_name.c_str(),
-//                        eta_bin
-//                    );
-//                    const std::string fit_plot_fail_name = lt::string_replace_last(fit_plot_pass_name, "pass", "fail"); 
-//
-//                    PrintCanvas(result.cpass, fit_plot_pass_name, suffix);
-//                    PrintCanvas(result.cfail, fit_plot_fail_name, suffix);
-//                }
-//            }
-//
-//            // add histograms to hist container
-//            hc.Add(h_num);
-//            hc.Add(h_den);
-//            hc.Add(h_eff);
-//        }
-//
-//        // phi bins
-//        // ------------------------------------------------------ //
-//
-//        if (not phi_bins.empty())
-//        {
-//            TH1* h_num = new TH1F("h_num_phi", Form("Numerator Counts;%s"  , phi_title.c_str()), num_phi_bins, phi_bins.data());
-//            TH1* h_den = new TH1F("h_den_phi", Form("Denominator Counts;%s", phi_title.c_str()), num_phi_bins, phi_bins.data());
-//            TH1* h_eff = new TH1F("h_eff_phi", Form("Efficiency;%s"        , phi_title.c_str()), num_phi_bins, phi_bins.data());
-//            h_eff->GetYaxis()->SetRangeUser(0, 1.1);
-//
-//            // models
-//            const ModelArray2D phi_models = GetModelArrayFromVString(tnp_cfg.getParameter<std::vector<std::string> >("phi_models"), phi_bins); 
-//
-//            for (size_t phi_bin = 0; phi_bin != num_phi_bins; phi_bin++)
-//            {
-//                tnp::Result result;
-//                if (dataset.m_is_data)
-//                {
-//                    tnp::Model::value_type sig_pass_model = phi_models[phi_bin][0];
-//                    tnp::Model::value_type sig_fail_model = phi_models[phi_bin][1];
-//                    tnp::Model::value_type bkg_pass_model = phi_models[phi_bin][2];
-//                    tnp::Model::value_type bkg_fail_model = phi_models[phi_bin][3];
-//
-//                    TH1* const h_pass = hc_mass[Form("h_pass_phi%lu", phi_bin)];
-//                    TH1* const h_fail = hc_mass[Form("h_fail_phi%lu", phi_bin)];
-//
-//                    TH1* const h_pass_template = hc_template[Form("h_pass_phi%lu", phi_bin)];
-//                    TH1* const h_fail_template = hc_template[Form("h_fail_phi%lu", phi_bin)];
-//
-//                    // do the fit
-//                    result = PerformSimultaneousFit
-//                    (
-//                         sig_pass_model, 
-//                         sig_fail_model, 
-//                         bkg_pass_model, 
-//                         bkg_fail_model, 
-//                         h_pass, 
-//                         h_fail,
-//                         mass_low,
-//                         mass_high,
-//                         mass_bin_width,
-//                         /*a_bin_label = */Form("%1.2f < %s < %1.2f", phi_bins[phi_bin], phi_title.c_str(), phi_bins[phi_bin+1]), 
-//                         /*b_bin_label = */"", 
-//                         h_pass_template,
-//                         h_fail_template
-//                    );
-//
-//                }
-//                else
-//                {
-//                    TH1* const h_pass = hc_mass[Form("h_pass_phi%lu", phi_bin)];
-//                    TH1* const h_fail = hc_mass[Form("h_fail_phi%lu", phi_bin)];
-//
-//                    // do the count
-//                    result = tnp::PerformSimpleCount
-//                    (
-//                         h_pass, 
-//                         h_fail,
-//                         mass_low,
-//                         mass_high,
-//                         mass_bin_width,
-//                         /*a_bin_label = */Form("%1.2f < %s < %1.2f", phi_bins[phi_bin], phi_title.c_str(), phi_bins[phi_bin+1]), 
-//                         /*b_bin_label = */"" 
-//                    );
-//
-//                }
-//
-//                // check for nan
-//                if (std::isnan(result.num.value)) {result.num.value = 0.0;}
-//                if (std::isnan(result.num.error)) {result.num.error = 0.0;}
-//                if (std::isnan(result.den.value)) {result.den.value = 0.0;}
-//                if (std::isnan(result.den.error)) {result.den.error = 0.0;}
-//                if (std::isnan(result.eff.value)) {result.eff.value = 0.0;}
-//                if (std::isnan(result.eff.error)) {result.eff.error = 0.0;}
-//
-//                // record output to histogram
-//                h_num->SetBinContent(phi_bin+1, result.num.value);
-//                h_num->SetBinError  (phi_bin+1, result.num.error);
-//                h_den->SetBinContent(phi_bin+1, result.den.value);
-//                h_den->SetBinError  (phi_bin+1, result.den.error);
-//                h_eff->SetBinContent(phi_bin+1, result.eff.value);
-//                h_eff->SetBinError  (phi_bin+1, result.eff.error);
-//
-//                // print the fit plot
-//                if (not suffix.empty())
-//                {
-//                    const std::string fit_plot_pass_name = Form("%s/plots/%s/%s/%s_%s/%s_eff/p_pass_phi%lu",
-//                        analysis_path.c_str(),
-//                        output_label.c_str(),
-//                        GetStringFromLepton(lepton_type).c_str(),
-//                        GetStringFromSelection(den_selection).c_str(),
-//                        GetStringFromSelection(num_selection).c_str(),
-//                        dataset.m_name.c_str(),
-//                        phi_bin
-//                    );
-//                    const std::string fit_plot_fail_name = lt::string_replace_last(fit_plot_pass_name, "pass", "fail"); 
-//
-//                    PrintCanvas(result.cpass, fit_plot_pass_name, suffix);
-//                    PrintCanvas(result.cfail, fit_plot_fail_name, suffix);
-//                }
-//            }
-//
-//            // add histograms to hist container
-//            hc.Add(h_num);
-//            hc.Add(h_den);
-//            hc.Add(h_eff);
-//        }
-//
-//        // nvtx bins
-//        // ------------------------------------------------------ //
-//
-//        if (not nvtx_bins.empty())
-//        {
-//            TH1* h_num = new TH1F("h_num_nvtx", "Numerator Counts;# vertices"  , num_nvtx_bins, nvtx_bins.data());
-//            TH1* h_den = new TH1F("h_den_nvtx", "Denominator Counts;# vertices", num_nvtx_bins, nvtx_bins.data());
-//            TH1* h_eff = new TH1F("h_eff_nvtx", "Efficiency;# vertices"        , num_nvtx_bins, nvtx_bins.data());
-//            h_eff->GetYaxis()->SetRangeUser(0, 1.1);
-//
-//            // models
-//            const ModelArray2D nvtx_models = GetModelArrayFromVString(tnp_cfg.getParameter<std::vector<std::string> >("nvtx_models"), nvtx_bins); 
-//
-//            for (size_t nvtx_bin = 0; nvtx_bin != num_nvtx_bins; nvtx_bin++)
-//            {
-//                tnp::Result result;
-//                if (dataset.m_is_data)
-//                {
-//                    tnp::Model::value_type sig_pass_model = nvtx_models[nvtx_bin][0];
-//                    tnp::Model::value_type sig_fail_model = nvtx_models[nvtx_bin][1];
-//                    tnp::Model::value_type bkg_pass_model = nvtx_models[nvtx_bin][2];
-//                    tnp::Model::value_type bkg_fail_model = nvtx_models[nvtx_bin][3];
-//
-//                    TH1* const h_pass = hc_mass[Form("h_pass_nvtx%lu", nvtx_bin)];
-//                    TH1* const h_fail = hc_mass[Form("h_fail_nvtx%lu", nvtx_bin)];
-//
-//                    TH1* const h_pass_template = hc_template[Form("h_pass_nvtx%lu", nvtx_bin)];
-//                    TH1* const h_fail_template = hc_template[Form("h_fail_nvtx%lu", nvtx_bin)];
-//
-//                    // do the fit
-//                    result = PerformSimultaneousFit
-//                    (
-//                         sig_pass_model, 
-//                         sig_fail_model, 
-//                         bkg_pass_model, 
-//                         bkg_fail_model, 
-//                         h_pass, 
-//                         h_fail,
-//                         mass_low,
-//                         mass_high,
-//                         mass_bin_width,
-//                         /*a_bin_label = */Form("%1.0f < # vertices < %1.0f", nvtx_bins[nvtx_bin], nvtx_bins[nvtx_bin+1]), 
-//                         /*b_bin_label = */"", 
-//                         h_pass_template,
-//                         h_fail_template
-//                    );
-//
-//                }
-//                else
-//                {
-//                    TH1* const h_pass = hc_mass[Form("h_pass_nvtx%lu", nvtx_bin)];
-//                    TH1* const h_fail = hc_mass[Form("h_fail_nvtx%lu", nvtx_bin)];
-//
-//                    // do the count
-//                    result = tnp::PerformSimpleCount
-//                    (
-//                         h_pass, 
-//                         h_fail,
-//                         mass_low,
-//                         mass_high,
-//                         mass_bin_width,
-//                         /*a_bin_label = */Form("%1.0f < # vertices < %1.0f", nvtx_bins[nvtx_bin], nvtx_bins[nvtx_bin+1]), 
-//                         /*b_bin_label = */"" 
-//                    );
-//
-//                }
-//
-//                // check for nan
-//                if (std::isnan(result.num.value)) {result.num.value = 0.0;}
-//                if (std::isnan(result.num.error)) {result.num.error = 0.0;}
-//                if (std::isnan(result.den.value)) {result.den.value = 0.0;}
-//                if (std::isnan(result.den.error)) {result.den.error = 0.0;}
-//                if (std::isnan(result.eff.value)) {result.eff.value = 0.0;}
-//                if (std::isnan(result.eff.error)) {result.eff.error = 0.0;}
-//
-//                // record output to histogram
-//                h_num->SetBinContent(nvtx_bin+1, result.num.value);
-//                h_num->SetBinError  (nvtx_bin+1, result.num.error);
-//                h_den->SetBinContent(nvtx_bin+1, result.den.value);
-//                h_den->SetBinError  (nvtx_bin+1, result.den.error);
-//                h_eff->SetBinContent(nvtx_bin+1, result.eff.value);
-//                h_eff->SetBinError  (nvtx_bin+1, result.eff.error);
-//
-//                // print the fit plot
-//                if (not suffix.empty())
-//                {
-//                    const std::string fit_plot_pass_name = Form("%s/plots/%s/%s/%s_%s/%s_eff/p_pass_nvtx%lu",
-//                        analysis_path.c_str(),
-//                        output_label.c_str(),
-//                        GetStringFromLepton(lepton_type).c_str(),
-//                        GetStringFromSelection(den_selection).c_str(),
-//                        GetStringFromSelection(num_selection).c_str(),
-//                        dataset.m_name.c_str(),
-//                        nvtx_bin
-//                    );
-//                    const std::string fit_plot_fail_name = lt::string_replace_last(fit_plot_pass_name, "pass", "fail"); 
-//
-//                    PrintCanvas(result.cpass, fit_plot_pass_name, suffix);
-//                    PrintCanvas(result.cfail, fit_plot_fail_name, suffix);
-//                }
-//            }
-//
-//            // add histograms to hist container
-//            hc.Add(h_num);
-//            hc.Add(h_den);
-//            hc.Add(h_eff);
-//        }
-//
+        // pt bins
+        // ------------------------------------------------------ //
+
+        if (not pt_bins.empty())
+        {
+            TH1* h_num = new TH1F("h_num_pt", "Numerator Counts;p_{T} (GeV)"  , num_pt_bins, pt_bins.data());
+            TH1* h_den = new TH1F("h_den_pt", "Denominator Counts;p_{T} (GeV)", num_pt_bins, pt_bins.data());
+            TH1* h_eff = new TH1F("h_eff_pt", "Efficiency;p_{T} (GeV)"        , num_pt_bins, pt_bins.data());
+            h_eff->GetYaxis()->SetRangeUser(0, 1.1);
+
+            // models
+            const ModelArray2D pt_models = GetModelArrayFromVString(tnp_cfg.getParameter<std::vector<std::string> >("pt_models"), pt_bins); 
+
+            for (size_t pt_bin = 0; pt_bin != num_pt_bins; pt_bin++)
+            {
+                tnp::Result result;
+                if (dataset.m_is_data)
+                {
+                    tnp::Model::value_type sig_pass_model = pt_models[pt_bin][0];
+                    tnp::Model::value_type sig_fail_model = pt_models[pt_bin][1];
+                    tnp::Model::value_type bkg_pass_model = pt_models[pt_bin][2];
+                    tnp::Model::value_type bkg_fail_model = pt_models[pt_bin][3];
+                    cout << Form("fitting bins: pt %lu", pt_bin) << endl; 
+                    cout << "sig pass model = " << tnp::GetStringFromModel(sig_pass_model) << endl; 
+                    cout << "sig fail model = " << tnp::GetStringFromModel(sig_fail_model) << endl; 
+                    cout << "bkg pass model = " << tnp::GetStringFromModel(bkg_pass_model) << endl; 
+                    cout << "bkg fail model = " << tnp::GetStringFromModel(bkg_fail_model) << endl; 
+
+                    TH1* const h_pass = hc_mass[Form("h_pass_pt%lu", pt_bin)];
+                    TH1* const h_fail = hc_mass[Form("h_fail_pt%lu", pt_bin)];
+
+                    TH1* const h_pass_template = hc_template[Form("h_pass_pt%lu", pt_bin)];
+                    TH1* const h_fail_template = hc_template[Form("h_fail_pt%lu", pt_bin)];
+
+                    // do the fit
+                    result = PerformSimultaneousFit
+                    (
+                         sig_pass_model, 
+                         sig_fail_model, 
+                         bkg_pass_model, 
+                         bkg_fail_model, 
+                         h_pass, 
+                         h_fail,
+                         mass_low,
+                         mass_high,
+                         mass_bin_width,
+                         /*a_bin_label = */Form("%1.0f GeV < p_{T} < %1.0f GeV", pt_bins[pt_bin], pt_bins[pt_bin+1]), 
+                         /*b_bin_label = */"", 
+                         h_pass_template,
+                         h_fail_template
+                    );
+
+                }
+                else
+                {
+                    TH1* const h_pass = hc_mass[Form("h_pass_pt%lu", pt_bin)];
+                    TH1* const h_fail = hc_mass[Form("h_fail_pt%lu", pt_bin)];
+
+                    // do the count
+                    result = tnp::PerformSimpleCount
+                    (
+                         h_pass, 
+                         h_fail,
+                         mass_low,
+                         mass_high,
+                         mass_bin_width,
+                         /*a_bin_label = */Form("%1.0f GeV < p_{T} < %1.0f GeV", pt_bins[pt_bin], pt_bins[pt_bin+1]), 
+                         /*b_bin_label = */"" 
+                    );
+
+                }
+
+                // check for nan
+                if (std::isnan(result.num.value)) {result.num.value = 0.0;}
+                if (std::isnan(result.num.error)) {result.num.error = 0.0;}
+                if (std::isnan(result.den.value)) {result.den.value = 0.0;}
+                if (std::isnan(result.den.error)) {result.den.error = 0.0;}
+                if (std::isnan(result.eff.value)) {result.eff.value = 0.0;}
+                if (std::isnan(result.eff.error)) {result.eff.error = 0.0;}
+
+                // record output to histogram
+                h_num->SetBinContent(pt_bin+1, std::max(result.num.value, 0.0));
+                h_num->SetBinError  (pt_bin+1, std::max(result.num.error, 0.0));
+                h_den->SetBinContent(pt_bin+1, std::max(result.den.value, 0.0));
+                h_den->SetBinError  (pt_bin+1, std::max(result.den.error, 0.0));
+                h_eff->SetBinContent(pt_bin+1, std::max(result.eff.value, 0.0));
+                h_eff->SetBinError  (pt_bin+1, std::max(result.eff.error, 0.0));
+
+                // print the fit plot
+                if (not suffix.empty())
+                {
+                    const std::string fit_plot_pass_name = Form("%s/plots/%s/%s/%s_%s/%s_eff/p_pass_pt%lu",
+                        analysis_path.c_str(),
+                        output_label.c_str(),
+                        GetStringFromLepton(lepton_type).c_str(),
+                        GetStringFromSelection(den_selection).c_str(),
+                        GetStringFromSelection(num_selection).c_str(),
+                        dataset.m_name.c_str(),
+                        pt_bin
+                    );
+                    const std::string fit_plot_fail_name = lt::string_replace_last(fit_plot_pass_name, "pass", "fail"); 
+
+                    PrintCanvas(result.cpass, fit_plot_pass_name, suffix);
+                    PrintCanvas(result.cfail, fit_plot_fail_name, suffix);
+                }
+            }
+
+            // add histograms to hist container
+            hc.Add(h_num);
+            hc.Add(h_den);
+            hc.Add(h_eff);
+        }
+
+        // eta bins
+        // ------------------------------------------------------ //
+
+        if (not eta_bins.empty())
+        {
+            TH1* h_num = new TH1F("h_num_eta", Form("Numerator Counts;%s"  , eta_title.c_str()), num_eta_bins, eta_bins.data());
+            TH1* h_den = new TH1F("h_den_eta", Form("Denominator Counts;%s", eta_title.c_str()), num_eta_bins, eta_bins.data());
+            TH1* h_eff = new TH1F("h_eff_eta", Form("Efficiency;%s"        , eta_title.c_str()), num_eta_bins, eta_bins.data());
+            h_eff->GetYaxis()->SetRangeUser(0, 1.1);
+
+            // models
+            const ModelArray2D eta_models = GetModelArrayFromVString(tnp_cfg.getParameter<std::vector<std::string> >("eta_models"), eta_bins); 
+
+            for (size_t eta_bin = 0; eta_bin != num_eta_bins; eta_bin++)
+            {
+                tnp::Result result;
+                if (dataset.m_is_data)
+                {
+                    tnp::Model::value_type sig_pass_model = eta_models[eta_bin][0];
+                    tnp::Model::value_type sig_fail_model = eta_models[eta_bin][1];
+                    tnp::Model::value_type bkg_pass_model = eta_models[eta_bin][2];
+                    tnp::Model::value_type bkg_fail_model = eta_models[eta_bin][3];
+                    cout << Form("fitting bins: eta %lu", eta_bin) << endl; 
+                    cout << "sig pass model = " << tnp::GetStringFromModel(sig_pass_model) << endl; 
+                    cout << "sig fail model = " << tnp::GetStringFromModel(sig_fail_model) << endl; 
+                    cout << "bkg pass model = " << tnp::GetStringFromModel(bkg_pass_model) << endl; 
+                    cout << "bkg fail model = " << tnp::GetStringFromModel(bkg_fail_model) << endl; 
+
+                    TH1* const h_pass = hc_mass[Form("h_pass_eta%lu", eta_bin)];
+                    TH1* const h_fail = hc_mass[Form("h_fail_eta%lu", eta_bin)];
+
+                    TH1* const h_pass_template = hc_template[Form("h_pass_eta%lu", eta_bin)];
+                    TH1* const h_fail_template = hc_template[Form("h_fail_eta%lu", eta_bin)];
+
+                    // do the fit
+                    result = PerformSimultaneousFit
+                    (
+                         sig_pass_model, 
+                         sig_fail_model, 
+                         bkg_pass_model, 
+                         bkg_fail_model, 
+                         h_pass, 
+                         h_fail,
+                         mass_low,
+                         mass_high,
+                         mass_bin_width,
+                         /*a_bin_label = */Form("%1.2f < %s < %1.2f", eta_bins[eta_bin], eta_title.c_str(), eta_bins[eta_bin+1]), 
+                         /*b_bin_label = */"", 
+                         h_pass_template,
+                         h_fail_template
+                    );
+
+                }
+                else
+                {
+                    TH1* const h_pass = hc_mass[Form("h_pass_eta%lu", eta_bin)];
+                    TH1* const h_fail = hc_mass[Form("h_fail_eta%lu", eta_bin)];
+
+                    // do the count
+                    result = tnp::PerformSimpleCount
+                    (
+                         h_pass, 
+                         h_fail,
+                         mass_low,
+                         mass_high,
+                         mass_bin_width,
+                         /*a_bin_label = */Form("%1.2f < %s < %1.2f", eta_bins[eta_bin], eta_title.c_str(), eta_bins[eta_bin+1]), 
+                         /*b_bin_label = */"" 
+                    );
+
+                }
+
+                // check for nan
+                if (std::isnan(result.num.value)) {result.num.value = 0.0;}
+                if (std::isnan(result.num.error)) {result.num.error = 0.0;}
+                if (std::isnan(result.den.value)) {result.den.value = 0.0;}
+                if (std::isnan(result.den.error)) {result.den.error = 0.0;}
+                if (std::isnan(result.eff.value)) {result.eff.value = 0.0;}
+                if (std::isnan(result.eff.error)) {result.eff.error = 0.0;}
+
+                // record output to histogram
+                cout << "result.num = " << result.num_str() << endl;
+                cout << "result.den = " << result.den_str() << endl;
+                h_num->SetBinContent(eta_bin+1, std::max(result.num.value, 0.0));
+                h_num->SetBinError  (eta_bin+1, std::max(result.num.error, 0.0));
+                h_den->SetBinContent(eta_bin+1, std::max(result.den.value, 0.0));
+                h_den->SetBinError  (eta_bin+1, std::max(result.den.error, 0.0));
+                h_eff->SetBinContent(eta_bin+1, std::max(result.eff.value, 0.0));
+                h_eff->SetBinError  (eta_bin+1, std::max(result.eff.error, 0.0));
+
+                // print the fit plot
+                if (not suffix.empty())
+                {
+                    const std::string fit_plot_pass_name = Form("%s/plots/%s/%s/%s_%s/%s_eff/p_pass_eta%lu",
+                        analysis_path.c_str(),
+                        output_label.c_str(),
+                        GetStringFromLepton(lepton_type).c_str(),
+                        GetStringFromSelection(den_selection).c_str(),
+                        GetStringFromSelection(num_selection).c_str(),
+                        dataset.m_name.c_str(),
+                        eta_bin
+                    );
+                    const std::string fit_plot_fail_name = lt::string_replace_last(fit_plot_pass_name, "pass", "fail"); 
+
+                    PrintCanvas(result.cpass, fit_plot_pass_name, suffix);
+                    PrintCanvas(result.cfail, fit_plot_fail_name, suffix);
+                }
+            }
+
+            // add histograms to hist container
+            hc.Add(h_num);
+            hc.Add(h_den);
+            hc.Add(h_eff);
+        }
+
+        // phi bins
+        // ------------------------------------------------------ //
+
+        if (not phi_bins.empty())
+        {
+            TH1* h_num = new TH1F("h_num_phi", Form("Numerator Counts;%s"  , phi_title.c_str()), num_phi_bins, phi_bins.data());
+            TH1* h_den = new TH1F("h_den_phi", Form("Denominator Counts;%s", phi_title.c_str()), num_phi_bins, phi_bins.data());
+            TH1* h_eff = new TH1F("h_eff_phi", Form("Efficiency;%s"        , phi_title.c_str()), num_phi_bins, phi_bins.data());
+            h_eff->GetYaxis()->SetRangeUser(0, 1.1);
+
+            // models
+            const ModelArray2D phi_models = GetModelArrayFromVString(tnp_cfg.getParameter<std::vector<std::string> >("phi_models"), phi_bins); 
+
+            for (size_t phi_bin = 0; phi_bin != num_phi_bins; phi_bin++)
+            {
+                tnp::Result result;
+                if (dataset.m_is_data)
+                {
+                    tnp::Model::value_type sig_pass_model = phi_models[phi_bin][0];
+                    tnp::Model::value_type sig_fail_model = phi_models[phi_bin][1];
+                    tnp::Model::value_type bkg_pass_model = phi_models[phi_bin][2];
+                    tnp::Model::value_type bkg_fail_model = phi_models[phi_bin][3];
+                    cout << Form("fitting bins: phi %lu", phi_bin) << endl; 
+                    cout << "sig pass model = " << tnp::GetStringFromModel(sig_pass_model) << endl; 
+                    cout << "sig fail model = " << tnp::GetStringFromModel(sig_fail_model) << endl; 
+                    cout << "bkg pass model = " << tnp::GetStringFromModel(bkg_pass_model) << endl; 
+                    cout << "bkg fail model = " << tnp::GetStringFromModel(bkg_fail_model) << endl; 
+
+                    TH1* const h_pass = hc_mass[Form("h_pass_phi%lu", phi_bin)];
+                    TH1* const h_fail = hc_mass[Form("h_fail_phi%lu", phi_bin)];
+
+                    TH1* const h_pass_template = hc_template[Form("h_pass_phi%lu", phi_bin)];
+                    TH1* const h_fail_template = hc_template[Form("h_fail_phi%lu", phi_bin)];
+
+                    // do the fit
+                    result = PerformSimultaneousFit
+                    (
+                         sig_pass_model, 
+                         sig_fail_model, 
+                         bkg_pass_model, 
+                         bkg_fail_model, 
+                         h_pass, 
+                         h_fail,
+                         mass_low,
+                         mass_high,
+                         mass_bin_width,
+                         /*a_bin_label = */Form("%1.2f < %s < %1.2f", phi_bins[phi_bin], phi_title.c_str(), phi_bins[phi_bin+1]), 
+                         /*b_bin_label = */"", 
+                         h_pass_template,
+                         h_fail_template
+                    );
+
+                }
+                else
+                {
+                    TH1* const h_pass = hc_mass[Form("h_pass_phi%lu", phi_bin)];
+                    TH1* const h_fail = hc_mass[Form("h_fail_phi%lu", phi_bin)];
+
+                    // do the count
+                    result = tnp::PerformSimpleCount
+                    (
+                         h_pass, 
+                         h_fail,
+                         mass_low,
+                         mass_high,
+                         mass_bin_width,
+                         /*a_bin_label = */Form("%1.2f < %s < %1.2f", phi_bins[phi_bin], phi_title.c_str(), phi_bins[phi_bin+1]), 
+                         /*b_bin_label = */"" 
+                    );
+
+                }
+
+                // check for nan
+                if (std::isnan(result.num.value)) {result.num.value = 0.0;}
+                if (std::isnan(result.num.error)) {result.num.error = 0.0;}
+                if (std::isnan(result.den.value)) {result.den.value = 0.0;}
+                if (std::isnan(result.den.error)) {result.den.error = 0.0;}
+                if (std::isnan(result.eff.value)) {result.eff.value = 0.0;}
+                if (std::isnan(result.eff.error)) {result.eff.error = 0.0;}
+
+                // record output to histogram
+                h_num->SetBinContent(phi_bin+1, result.num.value);
+                h_num->SetBinError  (phi_bin+1, result.num.error);
+                h_den->SetBinContent(phi_bin+1, result.den.value);
+                h_den->SetBinError  (phi_bin+1, result.den.error);
+                h_eff->SetBinContent(phi_bin+1, result.eff.value);
+                h_eff->SetBinError  (phi_bin+1, result.eff.error);
+
+                // print the fit plot
+                if (not suffix.empty())
+                {
+                    const std::string fit_plot_pass_name = Form("%s/plots/%s/%s/%s_%s/%s_eff/p_pass_phi%lu",
+                        analysis_path.c_str(),
+                        output_label.c_str(),
+                        GetStringFromLepton(lepton_type).c_str(),
+                        GetStringFromSelection(den_selection).c_str(),
+                        GetStringFromSelection(num_selection).c_str(),
+                        dataset.m_name.c_str(),
+                        phi_bin
+                    );
+                    const std::string fit_plot_fail_name = lt::string_replace_last(fit_plot_pass_name, "pass", "fail"); 
+
+                    PrintCanvas(result.cpass, fit_plot_pass_name, suffix);
+                    PrintCanvas(result.cfail, fit_plot_fail_name, suffix);
+                }
+            }
+
+            // add histograms to hist container
+            hc.Add(h_num);
+            hc.Add(h_den);
+            hc.Add(h_eff);
+        }
+
+        // nvtx bins
+        // ------------------------------------------------------ //
+
+        if (not nvtx_bins.empty())
+        {
+            TH1* h_num = new TH1F("h_num_nvtx", "Numerator Counts;# vertices"  , num_nvtx_bins, nvtx_bins.data());
+            TH1* h_den = new TH1F("h_den_nvtx", "Denominator Counts;# vertices", num_nvtx_bins, nvtx_bins.data());
+            TH1* h_eff = new TH1F("h_eff_nvtx", "Efficiency;# vertices"        , num_nvtx_bins, nvtx_bins.data());
+            h_eff->GetYaxis()->SetRangeUser(0, 1.1);
+
+            // models
+            const ModelArray2D nvtx_models = GetModelArrayFromVString(tnp_cfg.getParameter<std::vector<std::string> >("nvtx_models"), nvtx_bins); 
+
+            for (size_t nvtx_bin = 0; nvtx_bin != num_nvtx_bins; nvtx_bin++)
+            {
+                tnp::Result result;
+                if (dataset.m_is_data)
+                {
+                    tnp::Model::value_type sig_pass_model = nvtx_models[nvtx_bin][0];
+                    tnp::Model::value_type sig_fail_model = nvtx_models[nvtx_bin][1];
+                    tnp::Model::value_type bkg_pass_model = nvtx_models[nvtx_bin][2];
+                    tnp::Model::value_type bkg_fail_model = nvtx_models[nvtx_bin][3];
+                    cout << Form("fitting bins: nvtx %lu", nvtx_bin) << endl; 
+                    cout << "sig pass model = " << tnp::GetStringFromModel(sig_pass_model) << endl; 
+                    cout << "sig fail model = " << tnp::GetStringFromModel(sig_fail_model) << endl; 
+                    cout << "bkg pass model = " << tnp::GetStringFromModel(bkg_pass_model) << endl; 
+                    cout << "bkg fail model = " << tnp::GetStringFromModel(bkg_fail_model) << endl; 
+
+                    TH1* const h_pass = hc_mass[Form("h_pass_nvtx%lu", nvtx_bin)];
+                    TH1* const h_fail = hc_mass[Form("h_fail_nvtx%lu", nvtx_bin)];
+
+                    TH1* const h_pass_template = hc_template[Form("h_pass_nvtx%lu", nvtx_bin)];
+                    TH1* const h_fail_template = hc_template[Form("h_fail_nvtx%lu", nvtx_bin)];
+
+                    // do the fit
+                    result = PerformSimultaneousFit
+                    (
+                         sig_pass_model, 
+                         sig_fail_model, 
+                         bkg_pass_model, 
+                         bkg_fail_model, 
+                         h_pass, 
+                         h_fail,
+                         mass_low,
+                         mass_high,
+                         mass_bin_width,
+                         /*a_bin_label = */Form("%1.0f < # vertices < %1.0f", nvtx_bins[nvtx_bin], nvtx_bins[nvtx_bin+1]), 
+                         /*b_bin_label = */"", 
+                         h_pass_template,
+                         h_fail_template
+                    );
+
+                }
+                else
+                {
+                    TH1* const h_pass = hc_mass[Form("h_pass_nvtx%lu", nvtx_bin)];
+                    TH1* const h_fail = hc_mass[Form("h_fail_nvtx%lu", nvtx_bin)];
+
+                    // do the count
+                    result = tnp::PerformSimpleCount
+                    (
+                         h_pass, 
+                         h_fail,
+                         mass_low,
+                         mass_high,
+                         mass_bin_width,
+                         /*a_bin_label = */Form("%1.0f < # vertices < %1.0f", nvtx_bins[nvtx_bin], nvtx_bins[nvtx_bin+1]), 
+                         /*b_bin_label = */"" 
+                    );
+
+                }
+
+                // check for nan
+                if (std::isnan(result.num.value)) {result.num.value = 0.0;}
+                if (std::isnan(result.num.error)) {result.num.error = 0.0;}
+                if (std::isnan(result.den.value)) {result.den.value = 0.0;}
+                if (std::isnan(result.den.error)) {result.den.error = 0.0;}
+                if (std::isnan(result.eff.value)) {result.eff.value = 0.0;}
+                if (std::isnan(result.eff.error)) {result.eff.error = 0.0;}
+
+                // record output to histogram
+                h_num->SetBinContent(nvtx_bin+1, result.num.value);
+                h_num->SetBinError  (nvtx_bin+1, result.num.error);
+                h_den->SetBinContent(nvtx_bin+1, result.den.value);
+                h_den->SetBinError  (nvtx_bin+1, result.den.error);
+                h_eff->SetBinContent(nvtx_bin+1, result.eff.value);
+                h_eff->SetBinError  (nvtx_bin+1, result.eff.error);
+
+                // print the fit plot
+                if (not suffix.empty())
+                {
+                    const std::string fit_plot_pass_name = Form("%s/plots/%s/%s/%s_%s/%s_eff/p_pass_nvtx%lu",
+                        analysis_path.c_str(),
+                        output_label.c_str(),
+                        GetStringFromLepton(lepton_type).c_str(),
+                        GetStringFromSelection(den_selection).c_str(),
+                        GetStringFromSelection(num_selection).c_str(),
+                        dataset.m_name.c_str(),
+                        nvtx_bin
+                    );
+                    const std::string fit_plot_fail_name = lt::string_replace_last(fit_plot_pass_name, "pass", "fail"); 
+
+                    PrintCanvas(result.cpass, fit_plot_pass_name, suffix);
+                    PrintCanvas(result.cfail, fit_plot_fail_name, suffix);
+                }
+            }
+
+            // add histograms to hist container
+            hc.Add(h_num);
+            hc.Add(h_den);
+            hc.Add(h_eff);
+        }
+
         // pt vs eta bins
         // ------------------------------------------------------ //
 
@@ -689,12 +709,6 @@ try
             {
                 for (size_t eta_bin = 0; eta_bin != num_eta_bins; eta_bin++)
                 {
-//                     if (not (pt_bin == 4 and eta_bin == 3)) {continue;}
-//                     if (not (eta_bin == 3)) {continue;}
-//                     if (not (pt_bin == 4)) {continue;}
-//                     if (not ((pt_bin==0 or pt_bin==1 or pt_bin==2 or pt_bin==3 or pt_bin==4 or pt_bin==5) and eta_bin == 3)) {continue;}
-                    if (not ((eta_bin==3 or eta_bin==2) and pt_bin == 4)) {continue;}
-
                     tnp::Result result;
                     if (dataset.m_is_data)
                     {
@@ -795,116 +809,121 @@ try
         }
 
         // eta vs phi bins
-//        // ------------------------------------------------------ //
-//
-//        if (not (eta_bins.empty() or phi_bins.empty()))
-//        {
-//            TH1* h_num = new TH2F("h_num_eta_vs_phi", Form("Numerator Counts;%s;p_{T} (GeV)"  , phi_title.c_str()), num_phi_bins, phi_bins.data(), num_eta_bins, eta_bins.data());
-//            TH1* h_den = new TH2F("h_den_eta_vs_phi", Form("Denominator Counts;%s;p_{T} (GeV)", phi_title.c_str()), num_phi_bins, phi_bins.data(), num_eta_bins, eta_bins.data());
-//            TH1* h_eff = new TH2F("h_eff_eta_vs_phi", Form("Efficiency;%s;p_{T} (GeV)"        , phi_title.c_str()), num_phi_bins, phi_bins.data(), num_eta_bins, eta_bins.data());
-//            h_eff->GetZaxis()->SetRangeUser(0, 1.1);
-//
-//            // models
-//            const ModelArray3D eta_vs_phi_models = GetModelArrayFromVString(tnp_cfg.getParameter<std::vector<std::string> >("eta_vs_phi_models"), eta_bins, phi_bins); 
-//
-//            for (size_t eta_bin = 0; eta_bin != num_eta_bins; eta_bin++)
-//            {
-//                for (size_t phi_bin = 0; phi_bin != num_phi_bins; phi_bin++)
-//                {
-//                    tnp::Result result;
-//                    if (dataset.m_is_data)
-//                    {
-//                        tnp::Model::value_type sig_pass_model = eta_vs_phi_models[eta_bin][phi_bin][0];
-//                        tnp::Model::value_type sig_fail_model = eta_vs_phi_models[eta_bin][phi_bin][1];
-//                        tnp::Model::value_type bkg_pass_model = eta_vs_phi_models[eta_bin][phi_bin][2];
-//                        tnp::Model::value_type bkg_fail_model = eta_vs_phi_models[eta_bin][phi_bin][3];
-//
-//                        TH1* const h_pass = hc_mass[Form("h_pass_eta%lu_vs_phi%lu", eta_bin, phi_bin)];
-//                        TH1* const h_fail = hc_mass[Form("h_fail_eta%lu_vs_phi%lu", eta_bin, phi_bin)];
-//
-//                        TH1* const h_pass_template = hc_template[Form("h_pass_eta%lu_vs_phi%lu", eta_bin, phi_bin)];
-//                        TH1* const h_fail_template = hc_template[Form("h_fail_eta%lu_vs_phi%lu", eta_bin, phi_bin)];
-//
-//                        // do the fit
-//                        result = PerformSimultaneousFit
-//                        (
-//                             sig_pass_model, 
-//                             sig_fail_model, 
-//                             bkg_pass_model, 
-//                             bkg_fail_model, 
-//                             h_pass, 
-//                             h_fail,
-//                             mass_low,
-//                             mass_high,
-//                             mass_bin_width,
-//                             /*a_bin_label = */Form("%1.2f < %s < %1.2f", phi_bins[phi_bin], phi_title.c_str(), phi_bins[phi_bin+1]), 
-//                             /*b_bin_label = */Form("%1.0f GeV < p_{T} < %1.0f GeV", eta_bins[eta_bin], eta_bins[eta_bin+1]), 
-//                             h_pass_template,
-//                             h_fail_template
-//                        );
-//
-//                    }
-//                    else
-//                    {
-//                        TH1* const h_pass = hc_mass[Form("h_pass_eta%lu_vs_phi%lu", eta_bin, phi_bin)];
-//                        TH1* const h_fail = hc_mass[Form("h_fail_eta%lu_vs_phi%lu", eta_bin, phi_bin)];
-//
-//                        // do the count
-//                        result = tnp::PerformSimpleCount
-//                        (
-//                             h_pass, 
-//                             h_fail,
-//                             mass_low,
-//                             mass_high,
-//                             mass_bin_width,
-//                             /*a_bin_label = */Form("%1.2f < %s < %1.2f", phi_bins[phi_bin], phi_title.c_str(), phi_bins[phi_bin+1]), 
-//                             /*b_bin_label = */Form("%1.0f GeV < p_{T} < %1.0f GeV", eta_bins[eta_bin], eta_bins[eta_bin+1]) 
-//                        );
-//
-//                    }
-//
-//                    // check for nan
-//                    if (std::isnan(result.num.value)) {result.num.value = 0.0;}
-//                    if (std::isnan(result.num.error)) {result.num.error = 0.0;}
-//                    if (std::isnan(result.den.value)) {result.den.value = 0.0;}
-//                    if (std::isnan(result.den.error)) {result.den.error = 0.0;}
-//                    if (std::isnan(result.eff.value)) {result.eff.value = 0.0;}
-//                    if (std::isnan(result.eff.error)) {result.eff.error = 0.0;}
-//
-//                    // record output to histogram
-//                    h_num->SetBinContent(phi_bin+1, eta_bin+1, result.num.value);
-//                    h_num->SetBinError  (phi_bin+1, eta_bin+1, result.num.error);
-//                    h_den->SetBinContent(phi_bin+1, eta_bin+1, result.den.value);
-//                    h_den->SetBinError  (phi_bin+1, eta_bin+1, result.den.error);
-//                    h_eff->SetBinContent(phi_bin+1, eta_bin+1, result.eff.value);
-//                    h_eff->SetBinError  (phi_bin+1, eta_bin+1, result.eff.error);
-//
-//                    // print the fit plot
-//                    if (not suffix.empty())
-//                    {
-//                        const std::string fit_plot_pass_name = Form("%s/plots/%s/%s/%s_%s/%s_eff/p_pass_eta%lu_vs_phi%lu",
-//                            analysis_path.c_str(),
-//                            output_label.c_str(),
-//                            GetStringFromLepton(lepton_type).c_str(),
-//                            GetStringFromSelection(den_selection).c_str(),
-//                            GetStringFromSelection(num_selection).c_str(),
-//                            dataset.m_name.c_str(),
-//                            eta_bin,
-//                            phi_bin
-//                        );
-//                        const std::string fit_plot_fail_name = lt::string_replace_last(fit_plot_pass_name, "pass", "fail"); 
-//
-//                        PrintCanvas(result.cpass, fit_plot_pass_name, suffix);
-//                        PrintCanvas(result.cfail, fit_plot_fail_name, suffix);
-//                    }
-//                }
-//            }
-//
-//            // add histograms to hist container
-//            hc.Add(h_num);
-//            hc.Add(h_den);
-//            hc.Add(h_eff);
-//        }
+        // ------------------------------------------------------ //
+
+        if (not (eta_bins.empty() or phi_bins.empty()))
+        {
+            TH1* h_num = new TH2F("h_num_eta_vs_phi", Form("Numerator Counts;%s;p_{T} (GeV)"  , phi_title.c_str()), num_phi_bins, phi_bins.data(), num_eta_bins, eta_bins.data());
+            TH1* h_den = new TH2F("h_den_eta_vs_phi", Form("Denominator Counts;%s;p_{T} (GeV)", phi_title.c_str()), num_phi_bins, phi_bins.data(), num_eta_bins, eta_bins.data());
+            TH1* h_eff = new TH2F("h_eff_eta_vs_phi", Form("Efficiency;%s;p_{T} (GeV)"        , phi_title.c_str()), num_phi_bins, phi_bins.data(), num_eta_bins, eta_bins.data());
+            h_eff->GetZaxis()->SetRangeUser(0, 1.1);
+
+            // models
+            const ModelArray3D eta_vs_phi_models = GetModelArrayFromVString(tnp_cfg.getParameter<std::vector<std::string> >("eta_vs_phi_models"), eta_bins, phi_bins); 
+
+            for (size_t eta_bin = 0; eta_bin != num_eta_bins; eta_bin++)
+            {
+                for (size_t phi_bin = 0; phi_bin != num_phi_bins; phi_bin++)
+                {
+                    tnp::Result result;
+                    if (dataset.m_is_data)
+                    {
+                        tnp::Model::value_type sig_pass_model = eta_vs_phi_models[eta_bin][phi_bin][0];
+                        tnp::Model::value_type sig_fail_model = eta_vs_phi_models[eta_bin][phi_bin][1];
+                        tnp::Model::value_type bkg_pass_model = eta_vs_phi_models[eta_bin][phi_bin][2];
+                        tnp::Model::value_type bkg_fail_model = eta_vs_phi_models[eta_bin][phi_bin][3];
+                        cout << Form("fitting bins: eta %lu, phi %lu ", eta_bin, phi_bin) << endl; 
+                        cout << "sig pass model = " << tnp::GetStringFromModel(sig_pass_model) << endl; 
+                        cout << "sig fail model = " << tnp::GetStringFromModel(sig_fail_model) << endl; 
+                        cout << "bkg pass model = " << tnp::GetStringFromModel(bkg_pass_model) << endl; 
+                        cout << "bkg fail model = " << tnp::GetStringFromModel(bkg_fail_model) << endl; 
+
+                        TH1* const h_pass = hc_mass[Form("h_pass_eta%lu_vs_phi%lu", eta_bin, phi_bin)];
+                        TH1* const h_fail = hc_mass[Form("h_fail_eta%lu_vs_phi%lu", eta_bin, phi_bin)];
+
+                        TH1* const h_pass_template = hc_template[Form("h_pass_eta%lu_vs_phi%lu", eta_bin, phi_bin)];
+                        TH1* const h_fail_template = hc_template[Form("h_fail_eta%lu_vs_phi%lu", eta_bin, phi_bin)];
+
+                        // do the fit
+                        result = PerformSimultaneousFit
+                        (
+                             sig_pass_model, 
+                             sig_fail_model, 
+                             bkg_pass_model, 
+                             bkg_fail_model, 
+                             h_pass, 
+                             h_fail,
+                             mass_low,
+                             mass_high,
+                             mass_bin_width,
+                             /*a_bin_label = */Form("%1.2f < %s < %1.2f", phi_bins[phi_bin], phi_title.c_str(), phi_bins[phi_bin+1]), 
+                             /*b_bin_label = */Form("%1.0f GeV < p_{T} < %1.0f GeV", eta_bins[eta_bin], eta_bins[eta_bin+1]), 
+                             h_pass_template,
+                             h_fail_template
+                        );
+
+                    }
+                    else
+                    {
+                        TH1* const h_pass = hc_mass[Form("h_pass_eta%lu_vs_phi%lu", eta_bin, phi_bin)];
+                        TH1* const h_fail = hc_mass[Form("h_fail_eta%lu_vs_phi%lu", eta_bin, phi_bin)];
+
+                        // do the count
+                        result = tnp::PerformSimpleCount
+                        (
+                             h_pass, 
+                             h_fail,
+                             mass_low,
+                             mass_high,
+                             mass_bin_width,
+                             /*a_bin_label = */Form("%1.2f < %s < %1.2f", phi_bins[phi_bin], phi_title.c_str(), phi_bins[phi_bin+1]), 
+                             /*b_bin_label = */Form("%1.0f GeV < p_{T} < %1.0f GeV", eta_bins[eta_bin], eta_bins[eta_bin+1]) 
+                        );
+
+                    }
+
+                    // check for nan
+                    if (std::isnan(result.num.value)) {result.num.value = 0.0;}
+                    if (std::isnan(result.num.error)) {result.num.error = 0.0;}
+                    if (std::isnan(result.den.value)) {result.den.value = 0.0;}
+                    if (std::isnan(result.den.error)) {result.den.error = 0.0;}
+                    if (std::isnan(result.eff.value)) {result.eff.value = 0.0;}
+                    if (std::isnan(result.eff.error)) {result.eff.error = 0.0;}
+
+                    // record output to histogram
+                    h_num->SetBinContent(phi_bin+1, eta_bin+1, result.num.value);
+                    h_num->SetBinError  (phi_bin+1, eta_bin+1, result.num.error);
+                    h_den->SetBinContent(phi_bin+1, eta_bin+1, result.den.value);
+                    h_den->SetBinError  (phi_bin+1, eta_bin+1, result.den.error);
+                    h_eff->SetBinContent(phi_bin+1, eta_bin+1, result.eff.value);
+                    h_eff->SetBinError  (phi_bin+1, eta_bin+1, result.eff.error);
+
+                    // print the fit plot
+                    if (not suffix.empty())
+                    {
+                        const std::string fit_plot_pass_name = Form("%s/plots/%s/%s/%s_%s/%s_eff/p_pass_eta%lu_vs_phi%lu",
+                            analysis_path.c_str(),
+                            output_label.c_str(),
+                            GetStringFromLepton(lepton_type).c_str(),
+                            GetStringFromSelection(den_selection).c_str(),
+                            GetStringFromSelection(num_selection).c_str(),
+                            dataset.m_name.c_str(),
+                            eta_bin,
+                            phi_bin
+                        );
+                        const std::string fit_plot_fail_name = lt::string_replace_last(fit_plot_pass_name, "pass", "fail"); 
+
+                        PrintCanvas(result.cpass, fit_plot_pass_name, suffix);
+                        PrintCanvas(result.cfail, fit_plot_fail_name, suffix);
+                    }
+                }
+            }
+
+            // add histograms to hist container
+            hc.Add(h_num);
+            hc.Add(h_den);
+            hc.Add(h_eff);
+        }
 
         // write and print the output
         // ------------------------------------------------------ //
