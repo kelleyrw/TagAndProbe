@@ -25,13 +25,13 @@
     const float eta_bins[] = {0, 0.8, 1.4442, 1.566, 2.0, 2.5};
     const size_t num_eta_bins = 5;
 
-/*     size_t pt_bin  = 4; */
-/*     size_t eta_bin = 3; */
-    for (size_t pt_bin = 0; pt_bin != num_pt_bins; pt_bin++)
+    size_t pt_bin  = 0;
+    size_t eta_bin = 3;
+/*     for (size_t pt_bin = 0; pt_bin != num_pt_bins; pt_bin++) */
     {
-        for (size_t eta_bin = 0; eta_bin != num_eta_bins; eta_bin++)
+/*         for (size_t eta_bin = 0; eta_bin != num_eta_bins; eta_bin++) */
         {
-            if (!((eta_bin==3 || eta_bin==2) && pt_bin == 4)) {continue;}
+/*             if (!((eta_bin==3 || eta_bin==2) && pt_bin == 4)) {continue;} */
             
             rt::TH1Container hc("plots/SameSign/electron/SameSignDenBoth_SameSignNum/data_single_el.root");
             TH1* h_pass = hc[Form("h_pass_pt%lu_vs_eta%lu", pt_bin, eta_bin)];
@@ -45,8 +45,8 @@
             (
                  tnp::Model::MCTemplate,
                  tnp::Model::MCTemplate,
-                 tnp::Model::Chebychev,
-                 tnp::Model::Chebychev,
+                 tnp::Model::Exponential,
+                 tnp::Model::ErfExp,
                  h_pass,
                  h_fail, 
                  60.0, 

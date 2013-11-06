@@ -784,6 +784,14 @@ namespace tnp
         RooAbsPdf& bpass_model   = *(bpass_model_ptr->model);
         RooAbsPdf& bfail_model   = *(bfail_model_ptr->model);
 
+        // print the models used:
+        cout << "Fitting using the following PDF models:" << endl;
+        cout << "sig pass model = " << tnp::GetStringFromModel(sig_pass_model) << endl; 
+        cout << "sig fail model = " << tnp::GetStringFromModel(sig_fail_model) << endl; 
+        cout << "bkg pass model = " << tnp::GetStringFromModel(bkg_pass_model) << endl; 
+        cout << "bkg fail model = " << tnp::GetStringFromModel(bkg_fail_model) << endl; 
+        
+
         // count maximums
         double nsig_max      = h_pass->Integral() + h_fail->Integral();
         double nbkg_fail_max = h_fail->Integral();
