@@ -71,4 +71,5 @@ mu_eff = cms.PSet(
 
 # a vector of all the comparison PSets --> will do them all.
 # process.tnp_compare = cms.VPSet(el_eff)
-process.tnp_compare = cms.VPSet(mu_eff)
+# process.tnp_compare = cms.VPSet(mu_eff)
+process.tnp_compare = cms.VPSet(el_eff, mu_eff)
