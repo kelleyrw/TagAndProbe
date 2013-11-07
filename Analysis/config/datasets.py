@@ -18,14 +18,12 @@ lepton_tree_path = "/nfs-7/userdata/rwkelley/lepton_trees/" + lepton_tree_tag
 
 ## good run list
 run_list = cms.string(analysis_path + "/json/final_19p49fb.txt")
-# run_list = cms.string("")
 
 ## DY fullsim
 dy_full = cms.PSet(
 	name     = cms.string("dy_full"),
 	title    = cms.string("DY fullsim"),
-# 	files    = cms.vstring([lepton_tree_path+'/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball_Summer12_DR53X-PU_S10_START53_V7A-v1_AODSIM/*.root']),
-	files    = cms.vstring(['/nfs-7/userdata/rwkelley/lepton_trees/V00-02-07/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball_Summer12_DR53X-PU_S10_START53_V7A-v1_AODSIM/*.root']),
+	files    = cms.vstring([lepton_tree_path+'/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball_Summer12_DR53X-PU_S10_START53_V7A-v1_AODSIM/*.root']),
 	is_data  = cms.bool(False),
 	run_list = cms.string('')
 )
@@ -51,8 +49,7 @@ double_mu = cms.PSet(
 single_mu = cms.PSet(
 	name     = cms.string("data_single_mu"),
 	title    = cms.string("SingleMu_Run2012"),
-	#files    = cms.vstring([lepton_tree_path+'/SingleMu_Run2012*/*.root']),
-	files    = cms.vstring(['/nfs-7/userdata/rwkelley/lepton_trees/V00-02-09/SingleMu/*.root']),
+	files    = cms.vstring([lepton_tree_path+'/SingleMu_Run2012*/*.root']),
 	is_data  = cms.bool(True),
 	run_list = run_list 
 )
@@ -69,8 +66,7 @@ double_el = cms.PSet(
 single_el = cms.PSet(
 	name     = cms.string("data_single_el"),
 	title    = cms.string("SingleElectron_Run2012"),
-	#files    = cms.vstring([lepton_tree_path+'/SingleElectron_Run2012*/*.root']),
-	files    = cms.vstring(['/nfs-7/userdata/rwkelley/lepton_trees/V00-02-09/SingleElectron/*.root']),
+	files    = cms.vstring([lepton_tree_path+'/SingleElectron_Run2012*/*.root']),
 	is_data  = cms.bool(True),
 	run_list = run_list 
 )
