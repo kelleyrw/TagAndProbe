@@ -724,7 +724,7 @@ namespace tnp
     }
 
 
-    // helper function to create a tex box
+    // helper function to create a text box
     TPaveText* CreateTextBox(double x1, double y1, double x2, double y2, const std::string& text, const Color_t color = kBlack)
     {
         TPaveText *text_box = new TPaveText(x1, y1, x2, y2, "NDC");
@@ -736,7 +736,7 @@ namespace tnp
         return text_box;
     }
 
-    // Peform the fit
+    // Perform the fit
     Result PerformSimultaneousFit
     (
         const Model::value_type sig_pass_model, 
@@ -754,7 +754,7 @@ namespace tnp
         TH1* const h_fail_template
     )
     {
-        // test template hist's existence
+        // test template histogram's existence
         if (sig_pass_model == Model::MCTemplate && h_pass_template == NULL)
         {
             throw std::invalid_argument("[tnp::PerformSumultaneousFit] Error: pass template histogram is NULL!");
@@ -941,7 +941,7 @@ namespace tnp
         return simple_result;
     }
 
-    // Peform the fit
+    // Perform the fit
     Result PerformSimpleCount
     (
         //const Model::value_type model, 

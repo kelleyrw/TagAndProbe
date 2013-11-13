@@ -83,7 +83,7 @@ namespace tnp
 
     // Get the model
     
-    // Peform simultaneous fit
+    // Perform simultaneous fit
     Result PerformSimultaneousFit
     (
         const Model::value_type sig_pass_model, 
@@ -101,7 +101,7 @@ namespace tnp
         TH1* const h_fail_template = NULL
     );
 
-    // Peform smple count (no background fitting/subtraction) 
+    // Perform simple count (no background fitting/subtraction) 
     Result PerformSimpleCount
     (
         TH1* const h_pass, 
