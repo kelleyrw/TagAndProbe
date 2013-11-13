@@ -17,7 +17,8 @@ process.load("Smurf.ProcessingAndSkimming.leptontreemaker_cff")
 # input
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-        'root://xrootd.unl.edu//store/data/Run2012C/DoubleElectron/AOD/PromptReco-v2/000/200/075/C85ECB28-46DE-E111-A416-0025901D62A0.root'
+#          'root://xrootd.unl.edu//store/data/Run2012C/DoubleElectron/AOD/PromptReco-v2/000/200/075/C85ECB28-46DE-E111-A416-0025901D62A0.root'
+        'root://xrootd.unl.edu//store/data/Run2012A/DoubleElectron/AOD/22Jan2013-v1/20000/003EC246-5E67-E211-B103-00259059642E.root'
     )
 )
 
