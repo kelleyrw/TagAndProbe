@@ -851,11 +851,12 @@ namespace tnp
 //         w.factory("mass[80,100]");
 
         // Define categories
-//         w.factory("Category::sample[\"pass\",\"fail\"]");
-        RooCategory sample("sample","");
-        sample.defineType("pass",1);
-        sample.defineType("fail",2);
-        w.import(sample);
+        w.factory("sample[pass,fail]");
+//         RooCategory sample("sample","");
+//         sample.defineType("pass",1);
+//         sample.defineType("fail",2);
+//         w.import(sample);
+        RooCategory& sample = *w.cat("sample");
 
         // signal model (need ptr for polymorphism to work -- references for convenience)
         const std::string sig_pass_model_name = lt::string_replace_all(h_pass->GetName(), "h_", "model_sig_"); 
@@ -870,7 +871,6 @@ namespace tnp
         AddModelToWorkspace(sig_fail_model, w, sig_fail_model_name, h_fail_template); 
         AddModelToWorkspace(bkg_pass_model, w, bkg_pass_model_name); 
         AddModelToWorkspace(bkg_fail_model, w, bkg_fail_model_name); 
-        w.Print();
         
         RooAbsPdf& spass_model = *w.pdf(sig_pass_model_name.c_str());
         RooAbsPdf& sfail_model = *w.pdf(sig_fail_model_name.c_str());
@@ -885,6 +885,7 @@ namespace tnp
         cout << "sig fail model = " << tnp::GetStringFromModel(sig_fail_model) << endl; 
         cout << "bkg pass model = " << tnp::GetStringFromModel(bkg_pass_model) << endl; 
         cout << "bkg fail model = " << tnp::GetStringFromModel(bkg_fail_model) << endl; 
+        w.Print();
 
         // do the simultaneous fit 
         // ----------------------------------------- // 
