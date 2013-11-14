@@ -53,7 +53,8 @@ tnp_parameters = cms.PSet(
 	mass_bin_width = cms.double(2.0),   # GeV
 	
 	# datasets to run on
-	datasets = cms.VPSet(dy_full, single_el),
+# 	datasets = cms.VPSet(dy_full, single_el),                                     
+	datasets = cms.VPSet(single_el),
 
 	## bins for the observables
 	## supported pt, eta, phi, and # vertices
@@ -62,8 +63,8 @@ tnp_parameters = cms.PSet(
 	eta_bins  = cms.vdouble(0, 0.8, 1.4442, 1.566, 2.0, 2.5),
 # 	phi_bins  = cms.vdouble(0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.15),
 # 	nvtx_bins = cms.vdouble(0, 5, 10, 15, 20, 25, 30, 35, 40),
-	phi_bins  = cms.vdouble(),
-	nvtx_bins = cms.vdouble(),
+	phi_bins  = cms.vdouble(),               
+	nvtx_bins = cms.vdouble(),                    
 	
 	## selection (from Measurements.h/cc) 
 	numerator   = cms.string("EGammaMediumWPNum"  ),

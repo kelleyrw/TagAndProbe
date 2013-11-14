@@ -72,118 +72,124 @@ namespace tnp
 
         if (lepton_type == Lepton::Electron)
         {
-            // cut values and variables
-            const float el_is_barrel   = fabs(sceta()) < 1.4442;
-            const float el_is_endcap   = fabs(sceta()) > 1.566;
-            const float el_is_crack    = not (el_is_barrel or el_is_endcap);
-            const float el_probe_pt    = probe().pt();
-            const float el_tag_pt      = tag().pt();
-            const float el_d0          = fabs(d0vtx()); 
-            const float el_iso         = (pfchiso03() + TMath::Max(0.0f, pfemiso03() + pfnhiso03() - ea03() * TMath::Max(0.0f, rhoIsoAllCentral())))/el_probe_pt;
-            const float el_iso_eg_cut  = (el_is_endcap ? (el_probe_pt < 20.0 ? 0.10 : 0.15) : 0.15);  // egammamediumwp value 
-            const float el_iso_ss_cut  = 0.09;                                                        // ss2012 value
-            const float el_d0_cut      = 0.010;
-            const float el_tag_pt_cut  = 32.0;
-            const float el_hoe_cut     = (el_is_endcap ? 0.075 : 0.1); 
-            const int   el_mhits_cut   = 0; // allow maximum number of missing hits
-            const bool  el_3q          = chargesAgree();
-
-            // cut decisions 
-            const bool el_passes_pt       = (el_tag_pt > el_tag_pt_cut);
-            const bool el_passes_trig_tag = (is_data ? HLT_Ele27_WP80_tag() != 0 : true);
-            const bool el_passes_ss_iso   = (el_iso < el_iso_ss_cut); 
-            const bool el_passes_eg_iso   = (el_iso < el_iso_eg_cut); 
-            const bool el_passes_no_mhits = (mhit() <= el_mhits_cut); 
-            const bool el_passes_d0       = (fabs(el_d0) < el_d0_cut); 
-            const bool el_passes_id       = ((mediumId() & PassNoIso) == PassNoIso);
-            const bool el_passes_hoe      = (hoe() < el_hoe_cut);
-            const bool el_passes_3q       = (el_3q);
+            // convenience variables 
+            const float el_is_barrel = fabs(sceta()) < 1.4442;
+            const float el_is_endcap = fabs(sceta()) > 1.566;
+            const float el_is_crack  = not (el_is_barrel or el_is_endcap);
+            const float el_probe_pt  = probe().pt();
+            const float el_tag_pt    = tag().pt();
+            const float el_d0        = fabs(d0vtx()); 
+            const float el_iso       = (pfchiso03() + TMath::Max(0.0f, pfemiso03() + pfnhiso03() - ea03() * TMath::Max(0.0f, rhoIsoAllCentral())))/el_probe_pt;
 
             // EGamma Medium WP (2012)
             // https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaCutBasedIdentification 
             // --------------------------------------------------------------------------- //
 
+            // EGamma cuts and decisions
+            const float egamma_iso_cut        = (el_is_endcap ? (el_probe_pt < 20.0 ? 0.10 : 0.15) : 0.15);  // Medium WP value 
+            const float egamma_tag_pt_cut     = 25.0;
+            const bool  egamma_trig_tag       = (HLT_Ele17_Ele8_Mass50_LeadingLeg_tag()  != 0) or 
+                                                (HLT_Ele17_Ele8_Mass50_TrailingLeg_tag() != 0) or 
+                                                (HLT_Ele20_SC4_Mass50_LeadingLeg_tag()   != 0) or 
+                                                (HLT_Ele20_SC4_Mass50_TrailingLeg_tag()  != 0);
+            const bool egamma_passes_pt       = (el_tag_pt > egamma_tag_pt_cut);
+            const bool egamma_passes_trig_tag = (is_data ? egamma_trig_tag : true);
+            const bool egamma_passes_id       = ((mediumId() & PassNoIso) == PassNoIso);
+            const bool egamma_passes_iso      = (el_iso < egamma_iso_cut); 
+
             // Isolation
             if (selection == Selection::EGammaMediumWPDenIso)
             {
-                if (el_is_crack)            {return false;}
-                if (not el_passes_pt)       {return false;}
-                if (not el_passes_trig_tag) {return false;}
-                if (not el_passes_id)       {return false;}
+                if (not egamma_passes_pt)       {return false;}
+                if (not egamma_passes_trig_tag) {return false;}
+                if (not egamma_passes_id)       {return false;}
             }
 
             // ID
             if (selection == Selection::EGammaMediumWPDenID)
             {
-                if (el_is_crack)            {return false;}
-                if (not el_passes_pt)       {return false;}
-                if (not el_passes_trig_tag) {return false;}
-                if (not el_passes_eg_iso)   {return false;}
+                if (not egamma_passes_pt)       {return false;}
+                if (not egamma_passes_trig_tag) {return false;}
+                if (not egamma_passes_iso)      {return false;}
             }
 
             // Both ID and isolation 
             if (selection == Selection::EGammaMediumWPDenBoth)
             {
-                if (el_is_crack)            {return false;}
-                if (not el_passes_pt)       {return false;}
-                if (not el_passes_trig_tag) {return false;}
+                if (not egamma_passes_pt)       {return false;}
+                if (not egamma_passes_trig_tag) {return false;}
             }
 
             // Numerator
             if (selection == Selection::EGammaMediumWPNum)
             {
-                if (el_is_crack)             {return false;}
-                if (not el_passes_pt)        {return false;}
-                if (not el_passes_trig_tag)  {return false;}
-                if (not el_passes_id)        {return false;}
-                if (not el_passes_eg_iso)    {return false;}
+                if (not egamma_passes_pt)       {return false;}
+                if (not egamma_passes_trig_tag) {return false;}
+                if (not egamma_passes_id)       {return false;}
+                if (not egamma_passes_iso)      {return false;}
             }
 
             // SUS-13-013
             // --------------------------------------------------------------------------- //
 
+            // SUS-13-013 cuts and decisions (ss2013)
+            const float ss2013_el_iso_cut         = 0.09;
+            const float ss2013_el_d0_cut          = 0.010;
+            const float ss2013_el_tag_pt_cut      = 32.0;
+            const float ss2013_el_hoe_cut         = (el_is_endcap ? 0.075 : 0.1); 
+            const int   ss2013_el_mhits_cut       = 0; // allow maximum number of missing hits
+            const bool  ss2013_el_3q              = chargesAgree();
+            const bool  ss2013_el_passes_pt       = (el_tag_pt > ss2013_el_tag_pt_cut);
+            const bool  ss2013_el_passes_trig_tag = (is_data ? HLT_Ele27_WP80_tag() != 0 : true);
+            const bool  ss2013_el_passes_iso      = (el_iso < ss2013_el_iso_cut); 
+            const bool  ss2013_el_passes_no_mhits = (mhit() <= ss2013_el_mhits_cut); 
+            const bool  ss2013_el_passes_d0       = (el_d0 < ss2013_el_d0_cut); 
+            const bool  ss2013_el_passes_id       = ((mediumId() & PassNoIso) == PassNoIso);
+            const bool  ss2013_el_passes_hoe      = (hoe() < ss2013_el_hoe_cut);
+            const bool  ss2013_el_passes_3q       = (ss2013_el_3q);
+
             // Denominator
             if (selection == Selection::SameSignDenIso)
             {
-                if (el_is_crack)            {return false;}
-                if (not el_passes_pt)       {return false;}
-                if (not el_passes_trig_tag) {return false;}
-                if (not el_passes_id)       {return false;}
-                if (not el_passes_hoe)      {return false;}
-                if (not el_passes_no_mhits) {return false;}
-                if (not el_passes_3q)       {return false;}
-                if (not el_passes_d0)       {return false;}
+                if (el_is_crack)                   {return false;}
+                if (not ss2013_el_passes_pt)       {return false;}
+                if (not ss2013_el_passes_trig_tag) {return false;}
+                if (not ss2013_el_passes_id)       {return false;}
+                if (not ss2013_el_passes_hoe)      {return false;}
+                if (not ss2013_el_passes_no_mhits) {return false;}
+                if (not ss2013_el_passes_3q)       {return false;}
+                if (not ss2013_el_passes_d0)       {return false;}
             }
 
             // ID
             if (selection == Selection::SameSignDenID)
             {
-                if (el_is_crack)             {return false;}
-                if (not el_passes_pt)        {return false;}
-                if (not el_passes_trig_tag)  {return false;}
-                if (not el_passes_ss_iso)    {return false;}
+                if (el_is_crack)                   {return false;}
+                if (not ss2013_el_passes_pt)       {return false;}
+                if (not ss2013_el_passes_trig_tag) {return false;}
+                if (not ss2013_el_passes_iso)      {return false;}
             }
 
             // Both ID and isolation 
             if (selection == Selection::SameSignDenBoth)
             {
-                if (el_is_crack)            {return false;}
-                if (not el_passes_pt)       {return false;}
-                if (not el_passes_trig_tag) {return false;}
+                if (el_is_crack)                   {return false;}
+                if (not ss2013_el_passes_pt)       {return false;}
+                if (not ss2013_el_passes_trig_tag) {return false;}
             }
 
             // Numerator
             if (selection == Selection::SameSignNum)
             {
-                if (el_is_crack)             {return false;}
-                if (not el_passes_pt)        {return false;}
-                if (not el_passes_trig_tag)  {return false;}
-                if (not el_passes_id)        {return false;}
-                if (not el_passes_hoe)       {return false;}
-                if (not el_passes_no_mhits)  {return false;}
-                if (not el_passes_3q)        {return false;}
-                if (not el_passes_d0)        {return false;}
-                if (not el_passes_ss_iso)    {return false;}
+                if (el_is_crack)                   {return false;}
+                if (not ss2013_el_passes_pt)       {return false;}
+                if (not ss2013_el_passes_trig_tag) {return false;}
+                if (not ss2013_el_passes_id)       {return false;}
+                if (not ss2013_el_passes_hoe)      {return false;}
+                if (not ss2013_el_passes_no_mhits) {return false;}
+                if (not ss2013_el_passes_3q)       {return false;}
+                if (not ss2013_el_passes_d0)       {return false;}
+                if (not ss2013_el_passes_iso)      {return false;}
             }
         }
 
@@ -193,94 +199,99 @@ namespace tnp
 
         if (lepton_type == Lepton::Muon)
         {
-            // cut values and variables
+            // convenience variables 
             const float mu_tag_pt      = tag().pt();
             const float mu_probe_pt    = probe().pt();
             const float mu_d0          = fabs(d0vtx()); 
             const float mu_iso         = (pfchiso03() + TMath::Max(0.0f, pfemiso03() + pfnhiso03() - 0.5f * dbeta03()))/mu_probe_pt;
-            const float mu_iso_ss_cut  = 0.10;  // SUS-13-013 value
-            const float mu_iso_pog_cut = 0.15;  // Muon POG value (not sure about this one)
-            const float mu_d0_ss_cut   = 0.005; // SUS-13-013 value
-            const float mu_tag_pt_cut  = 30.0;
-
-            // cut decisions 
-            const bool mu_passes_pt       = (mu_tag_pt > mu_tag_pt_cut);
-            const bool mu_passes_trig_tag = (is_data ? HLT_IsoMu24_eta2p1_tag() != 0 : true);
-            const bool mu_passes_pog_iso  = (mu_iso < mu_iso_pog_cut); 
-            const bool mu_passes_pog_id   = ((leptonSelection() & LeptonSelection::PassMuIsHPASS) == LeptonSelection::PassMuIsHPASS);
-            const bool mu_passes_ss_iso   = (mu_iso < mu_iso_ss_cut); 
-            const bool mu_passes_ss_d0    = (fabs(mu_d0) < mu_d0_ss_cut); 
-            const bool mu_passes_ss_id    = ((leptonSelection() & LeptonSelection::PassMuIsHPASS) == LeptonSelection::PassMuIsHPASS) && (mu_passes_ss_d0);
 
             // Muon POG Selections (2012)
             // From: https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId
             // --------------------------------------------------------------------------- //
 
+            // Muon POG cuts and decisions
+            const float mupog_iso_cut         = 0.15;  // Muon POG value (not sure about this one)
+            const float mupog_tag_pt_cut      = 30.0;
+            const bool  mupog_passes_pt       = (mu_tag_pt > mupog_tag_pt_cut);
+            const bool  mupog_passes_trig_tag = (is_data ? HLT_IsoMu24_eta2p1_tag() != 0 : true);
+            const bool  mupog_passes_iso      = (mu_iso < mupog_iso_cut); 
+            const bool  mupog_passes_id       = ((leptonSelection() & LeptonSelection::PassMuIsHPASS) == LeptonSelection::PassMuIsHPASS);
+
             // Isolation
             if (selection == Selection::MuTightWPDenIso)
             {
-                if (not mu_passes_pt)       {return false;}
-                if (not mu_passes_trig_tag) {return false;}
-                if (not mu_passes_pog_id)   {return false;}
+                if (not mupog_passes_pt)       {return false;}
+                if (not mupog_passes_trig_tag) {return false;}
+                if (not mupog_passes_id)       {return false;}
             }
 
             // ID
             if (selection == Selection::MuTightWPDenID)
             {
-                if (not mu_passes_pt)        {return false;}
-                if (not mu_passes_trig_tag)  {return false;}
-                if (not mu_passes_pog_iso)   {return false;}
+                if (not mupog_passes_pt)       {return false;}
+                if (not mupog_passes_trig_tag) {return false;}
+                if (not mupog_passes_iso)      {return false;}
             }
 
             // Both ID and isolation
             if (selection == Selection::MuTightWPDenBoth)
             {
-                if (not mu_passes_pt)       {return false;}
-                if (not mu_passes_trig_tag) {return false;}
+                if (not mupog_passes_pt)       {return false;}
+                if (not mupog_passes_trig_tag) {return false;}
             }
 
             // Numerator
             if (selection == Selection::MuTightWPNum)
             {
-                if (not mu_passes_pt)       {return false;}
-                if (not mu_passes_trig_tag) {return false;}
-                if (not mu_passes_pog_id)   {return false;}
-                if (not mu_passes_pog_iso)  {return false;}
+                if (not mupog_passes_pt)       {return false;}
+                if (not mupog_passes_trig_tag) {return false;}
+                if (not mupog_passes_id)       {return false;}
+                if (not mupog_passes_iso)      {return false;}
             }
 
             // SUS-13-013 Selections
             // --------------------------------------------------------------------------- //
 
+            // SUS-13-013 cuts and decisions (ss2013)
+            const float ss2013_mu_iso_cut        = 0.10; 
+            const float ss2013_mu_d0_cut         = 0.005;
+            const float ss2013_mu_tag_pt_cut     = 30.0;
+            const bool ss2013_mu_passes_pt       = (mu_tag_pt > ss2013_mu_tag_pt_cut);
+            const bool ss2013_mu_passes_trig_tag = (is_data ? HLT_IsoMu24_eta2p1_tag() != 0 : true);
+            const bool ss2013_mu_passes_iso      = (mu_iso < ss2013_mu_iso_cut); 
+            const bool ss2013_mu_passes_d0       = (fabs(mu_d0) < ss2013_mu_d0_cut); 
+            const bool ss2013_mu_passes_id       = ((leptonSelection() & LeptonSelection::PassMuIsHPASS) == LeptonSelection::PassMuIsHPASS) && (ss2013_mu_passes_d0);
+
             // Isolation
             if (selection == Selection::SameSignDenIso)
             {
-                if (not mu_passes_pt)       {return false;}
-                if (not mu_passes_trig_tag) {return false;}
-                if (not mu_passes_ss_id)    {return false;}
+                if (not ss2013_mu_passes_pt)       {return false;}
+                if (not ss2013_mu_passes_trig_tag) {return false;}
+                if (not ss2013_mu_passes_id)       {return false;}
             }
 
             // ID
             if (selection == Selection::SameSignDenID)
             {
-                if (not mu_passes_pt)        {return false;}
-                if (not mu_passes_trig_tag)  {return false;}
-                if (not mu_passes_ss_iso)    {return false;}
+                if (not ss2013_mu_passes_pt)       {return false;}
+                if (not ss2013_mu_passes_trig_tag) {return false;}
+                if (not ss2013_mu_passes_iso)      {return false;}
             }
 
             // Both ID and isolation
             if (selection == Selection::SameSignDenBoth)
             {
-                if (not mu_passes_pt)       {return false;}
-                if (not mu_passes_trig_tag) {return false;}
+                if (not ss2013_mu_passes_pt)       {return false;}
+                if (not ss2013_mu_passes_trig_tag) {return false;}
             }
 
             // Numerator
             if (selection == Selection::SameSignNum)
             {
-                if (not mu_passes_pt)       {return false;}
-                if (not mu_passes_trig_tag) {return false;}
-                if (not mu_passes_ss_id)    {return false;}
-                if (not mu_passes_ss_iso)   {return false;}
+                if (not ss2013_mu_passes_pt)       {return false;}
+                if (not ss2013_mu_passes_trig_tag) {return false;}
+                if (not ss2013_mu_passes_id)       {return false;}
+                if (not ss2013_mu_passes_iso)      {return false;}
             }
         }
 

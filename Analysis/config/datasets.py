@@ -66,7 +66,8 @@ double_el = cms.PSet(
 single_el = cms.PSet(
 	name     = cms.string("data_single_el"),
 	title    = cms.string("SingleElectron_Run2012"),
-	files    = cms.vstring([lepton_tree_path+'/SingleElectron_Run2012*/*.root']),
+	files    = cms.vstring(['/nfs-7/userdata/rwkelley/lepton_trees/V00-02-09/SingleElectron/merged_Moriond.root']),
+	#files    = cms.vstring([lepton_tree_path+'/SingleElectron_Run2012*/*.root']),
 	is_data  = cms.bool(True),
 	run_list = run_list 
 )
