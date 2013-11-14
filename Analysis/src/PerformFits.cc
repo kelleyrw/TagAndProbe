@@ -599,13 +599,8 @@ namespace tnp
         return new PdfBase;
     }
 
-    void AddModelToWorkspace(Model::value_type model, RooWorkspace &w, const std::string& model_name, TH1* const hist_template = NULL)
+    void AddModelToWorkspace(Model::value_type model, RooWorkspace &w, const std::string& model_name)
     {
-        if (model == Model::MCTemplate && hist_template == NULL)
-        {
-            throw std::invalid_argument("[tnp::AddModelToWorkspace] Error: template histogram is NULL!");
-        }
-
         // convenience
         const std::string unique_label = lt::string_replace_first(model_name, "model_", "_").c_str(); 
         char const * const ul = unique_label.c_str(); 
@@ -629,27 +624,26 @@ namespace tnp
                 // gaussian
                 w.factory(Form("Gaussian::gaus%s(mass,mean%s[0,-10,10],sigma%s[2,0,10])", ul, ul, ul));
 
+                // template histogram
+                TH1* const h_template = dynamic_cast<TH1*>(w.obj(Form("h_template%s", ul)));
+                if (h_template == NULL)
+                {
+                    throw std::invalid_argument("[tnp::AddModelToWorkspace] Error: template histogram is NULL!");
+                }
+
                 // mc template
-                TH1* const h_template = dynamic_cast<TH1*>(hist_template->Clone(Form("h_template_%s", ul)));
-                w.import(*h_template);
                 RooDataHist data_hist(Form("data_hist%s", ul), Form("data_hist%s", ul), RooArgSet(*w.var("mass")), h_template);
-                RooHistPdf hist_pdf(Form("hist_pdf%s", ul), Form("hist_pdf%s", ul), *w.var("mass"), data_hist, /*interpolation_order=*/1);
-                w.import(hist_pdf);
+                w.import(data_hist);
+                w.factory(Form("HistPdf::hist_pdf%s(mass, data_hist%s, 1)", ul, ul));
 
                 // convolution
                 w.factory(Form("FCONV::%s(mass,hist_pdf%s,gaus%s)", model_name.c_str(), ul, ul));
-
-                // cleanup
-                delete h_template;
                 break;
             }
             case Model::Exponential: 
                 w.factory(Form("Exponential::%s(mass, t%s[-0.1,-1.0,0.0])", model_name.c_str(), ul)); 
                 break;
 
-//             case Model::BreitWignerCB: return new BreitWignerCBPdf(x, label);                     break; 
-//             case Model::MCTemplate:    return new MCTemplateConvGausPdf(x, hist_template, label); break; 
-//             case Model::Exponential:   return new ExponentialPdf(x, label);                       break; 
 //             case Model::Argus:         return new ArgusPdf(x, label);                             break; 
 //             case Model::ErfExp:        return new ErfExpPdf(x, label);                            break; 
 //             case Model::Chebychev:     return new ChebychevPdf(x, label);                         break; 
@@ -773,8 +767,8 @@ namespace tnp
     Result::~Result()
     {
         // fixme: not working quite right
-        //delete cpass;
-        //delete cfail;
+//         delete cpass;
+//         delete cfail;
     }
 
     std::string Result::eff_str() const
@@ -828,6 +822,13 @@ namespace tnp
         TH1* const h_fail_template
     )
     {
+        // print the models used:
+        cout << "[tnp::PerformSumultaneousFit] Fitting using the following PDF models:" << endl;
+        cout << "sig pass model = " << tnp::GetStringFromModel(sig_pass_model) << endl; 
+        cout << "sig fail model = " << tnp::GetStringFromModel(sig_fail_model) << endl; 
+        cout << "bkg pass model = " << tnp::GetStringFromModel(bkg_pass_model) << endl; 
+        cout << "bkg fail model = " << tnp::GetStringFromModel(bkg_fail_model) << endl; 
+
         // test template histogram's existence
         if (sig_pass_model == Model::MCTemplate && h_pass_template == NULL)
         {
@@ -848,15 +849,6 @@ namespace tnp
         // add independent variable (mass)
         RooRealVar mass("mass", "mass", mass_low, mass_high, "GeV");
         w.import(mass);
-//         w.factory("mass[80,100]");
-
-        // Define categories
-        w.factory("sample[pass,fail]");
-//         RooCategory sample("sample","");
-//         sample.defineType("pass",1);
-//         sample.defineType("fail",2);
-//         w.import(sample);
-        RooCategory& sample = *w.cat("sample");
 
         // signal model (need ptr for polymorphism to work -- references for convenience)
         const std::string sig_pass_model_name = lt::string_replace_all(h_pass->GetName(), "h_", "model_sig_"); 
@@ -867,28 +859,44 @@ namespace tnp
 //         const std::string sig_fail_model_name = "model_sig_fail"; 
 //         const std::string bkg_pass_model_name = "model_bkg_pass"; 
 //         const std::string bkg_fail_model_name = "model_bkg_fail"; 
-        AddModelToWorkspace(sig_pass_model, w, sig_pass_model_name, h_pass_template); 
-        AddModelToWorkspace(sig_fail_model, w, sig_fail_model_name, h_fail_template); 
+
+        // add template hist
+        if (sig_pass_model == Model::MCTemplate)
+        {
+            const std::string h_pass_newname = lt::string_replace_first(sig_pass_model_name, "model_", "h_template_"); 
+            TH1* const h_pass_template_temp = dynamic_cast<TH1*>(h_pass_template->Clone(h_pass_newname.c_str()));
+            w.import(*h_pass_template_temp);
+            delete h_pass_template_temp;
+        }
+        if (sig_fail_model == Model::MCTemplate)
+        {
+            const std::string h_fail_newname = lt::string_replace_first(sig_fail_model_name, "model_", "h_template_"); 
+            TH1* const h_fail_template_temp = dynamic_cast<TH1*>(h_fail_template->Clone(h_fail_newname.c_str()));
+            w.import(*h_fail_template_temp);
+            delete h_fail_template_temp;
+        }
+        w.Print();
+
+        AddModelToWorkspace(sig_pass_model, w, sig_pass_model_name); 
+        AddModelToWorkspace(sig_fail_model, w, sig_fail_model_name); 
         AddModelToWorkspace(bkg_pass_model, w, bkg_pass_model_name); 
         AddModelToWorkspace(bkg_fail_model, w, bkg_fail_model_name); 
         
+        // extract the PDF's from the workspace 
+        // ----------------------------------------- // 
+
         RooAbsPdf& spass_model = *w.pdf(sig_pass_model_name.c_str());
         RooAbsPdf& sfail_model = *w.pdf(sig_fail_model_name.c_str());
         RooAbsPdf& bpass_model = *w.pdf(bkg_pass_model_name.c_str());
         RooAbsPdf& bfail_model = *w.pdf(bkg_fail_model_name.c_str());
 
-//         RooRealVar& mass = *dynamic_cast<RooRealVar*>(w.arg("mass"));
-
-        // print the models used:
-        cout << "Fitting using the following PDF models:" << endl;
-        cout << "sig pass model = " << tnp::GetStringFromModel(sig_pass_model) << endl; 
-        cout << "sig fail model = " << tnp::GetStringFromModel(sig_fail_model) << endl; 
-        cout << "bkg pass model = " << tnp::GetStringFromModel(bkg_pass_model) << endl; 
-        cout << "bkg fail model = " << tnp::GetStringFromModel(bkg_fail_model) << endl; 
-        w.Print();
-
         // do the simultaneous fit 
         // ----------------------------------------- // 
+
+        // Define categories
+        RooCategory sample("sample","");
+        sample.defineType("pass",1);
+        sample.defineType("fail",2);
 
         // count maximums
         double nsig_max      = h_pass->Integral() + h_fail->Integral();
@@ -972,6 +980,8 @@ namespace tnp
  
         // passing plot
         simple_result.cpass->cd(); 
+        //simple_result.cpass->SetName(lt::string_replace_all(h_pass->GetName(), "h_", "canvas_").c_str());
+        //simple_result.cpass->SetTitle(simple_result.cpass->GetName());
         RooPlot *mframe_pass = mass.frame(RooFit::Bins(static_cast<int>(fabs(mass_high-mass_low)/2.0)));
         data_pass.plotOn(mframe_pass, RooFit::MarkerStyle(kFullCircle), RooFit::MarkerSize(0.8), RooFit::DrawOption("ZP"));
         model_pass.plotOn(mframe_pass);
@@ -991,6 +1001,8 @@ namespace tnp
 
         // failing plot
         simple_result.cfail->cd(); 
+        //simple_result.cfail->SetName(lt::string_replace_all(h_fail->GetName(), "h_", "canvas_").c_str());
+        //simple_result.cfail->SetTitle(simple_result.cfail->GetName());
         RooPlot *mframe_fail = mass.frame(RooFit::Bins(static_cast<int>(fabs(mass_high-mass_low)/mass_bin_width)));
         data_fail.plotOn(mframe_fail, RooFit::MarkerStyle(kFullCircle), RooFit::MarkerSize(0.8), RooFit::DrawOption("ZP"));
         model_fail.plotOn(mframe_fail);
@@ -1036,6 +1048,7 @@ namespace tnp
         t2.print();
  
         // done 
+//         Result simple_result;
         return simple_result;
     }
 
