@@ -851,14 +851,14 @@ namespace tnp
         w.import(mass);
 
         // signal model (need ptr for polymorphism to work -- references for convenience)
-        const std::string sig_pass_model_name = lt::string_replace_all(h_pass->GetName(), "h_", "model_sig_"); 
-        const std::string sig_fail_model_name = lt::string_replace_all(h_fail->GetName(), "h_", "model_sig_"); 
-        const std::string bkg_pass_model_name = lt::string_replace_all(h_pass->GetName(), "h_", "model_bkg_"); 
-        const std::string bkg_fail_model_name = lt::string_replace_all(h_fail->GetName(), "h_", "model_bkg_"); 
-//         const std::string sig_pass_model_name = "model_sig_pass"; 
-//         const std::string sig_fail_model_name = "model_sig_fail"; 
-//         const std::string bkg_pass_model_name = "model_bkg_pass"; 
-//         const std::string bkg_fail_model_name = "model_bkg_fail"; 
+//         const std::string sig_pass_model_name = lt::string_replace_all(h_pass->GetName(), "h_", "model_sig_"); 
+//         const std::string sig_fail_model_name = lt::string_replace_all(h_fail->GetName(), "h_", "model_sig_"); 
+//         const std::string bkg_pass_model_name = lt::string_replace_all(h_pass->GetName(), "h_", "model_bkg_"); 
+//         const std::string bkg_fail_model_name = lt::string_replace_all(h_fail->GetName(), "h_", "model_bkg_"); 
+        const std::string sig_pass_model_name = "model_sig_pass"; 
+        const std::string sig_fail_model_name = "model_sig_fail"; 
+        const std::string bkg_pass_model_name = "model_bkg_pass"; 
+        const std::string bkg_fail_model_name = "model_bkg_fail"; 
 
         // add template hist
         if (sig_pass_model == Model::MCTemplate)
@@ -980,8 +980,8 @@ namespace tnp
  
         // passing plot
         simple_result.cpass->cd(); 
-        //simple_result.cpass->SetName(lt::string_replace_all(h_pass->GetName(), "h_", "canvas_").c_str());
-        //simple_result.cpass->SetTitle(simple_result.cpass->GetName());
+        simple_result.cpass->SetName(lt::string_replace_all(h_pass->GetName(), "h_", "canvas_").c_str());
+        simple_result.cpass->SetTitle(simple_result.cpass->GetName());
         RooPlot *mframe_pass = mass.frame(RooFit::Bins(static_cast<int>(fabs(mass_high-mass_low)/2.0)));
         data_pass.plotOn(mframe_pass, RooFit::MarkerStyle(kFullCircle), RooFit::MarkerSize(0.8), RooFit::DrawOption("ZP"));
         model_pass.plotOn(mframe_pass);
@@ -1001,8 +1001,8 @@ namespace tnp
 
         // failing plot
         simple_result.cfail->cd(); 
-        //simple_result.cfail->SetName(lt::string_replace_all(h_fail->GetName(), "h_", "canvas_").c_str());
-        //simple_result.cfail->SetTitle(simple_result.cfail->GetName());
+        simple_result.cfail->SetName(lt::string_replace_all(h_fail->GetName(), "h_", "canvas_").c_str());
+        simple_result.cfail->SetTitle(simple_result.cfail->GetName());
         RooPlot *mframe_fail = mass.frame(RooFit::Bins(static_cast<int>(fabs(mass_high-mass_low)/mass_bin_width)));
         data_fail.plotOn(mframe_fail, RooFit::MarkerStyle(kFullCircle), RooFit::MarkerSize(0.8), RooFit::DrawOption("ZP"));
         model_fail.plotOn(mframe_fail);
@@ -1048,7 +1048,6 @@ namespace tnp
         t2.print();
  
         // done 
-//         Result simple_result;
         return simple_result;
     }
 
