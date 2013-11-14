@@ -31,6 +31,7 @@
 #include "RooPolynomial.h"
 #include "RooChebychev.h"
 #include "RooArgusBG.h"
+#include "RooWorkspace.h"
 
 // CMSSW
 #include "PhysicsTools/TagAndProbe/interface/RooCMSShape.h"
@@ -598,6 +599,79 @@ namespace tnp
         return new PdfBase;
     }
 
+    void AddModelToWorkspace(Model::value_type model, RooWorkspace &w, const std::string& model_name, TH1* const hist_template = NULL)
+    {
+        if (model == Model::MCTemplate && hist_template == NULL)
+        {
+            throw std::invalid_argument("[tnp::AddModelToWorkspace] Error: template histogram is NULL!");
+        }
+
+        // convenience
+        const std::string unique_label = lt::string_replace_first(model_name, "model_", "_").c_str(); 
+        char const * const ul = unique_label.c_str(); 
+
+        switch (model)
+        {
+            case Model::BreitWignerCB: 
+            {
+                // breitwigner
+                w.factory(Form("BreitWigner::bw%s(mass,mz%s[91.1876,80,100],gammaz%s[2.4952,0.1,10])", ul, ul, ul));
+
+                // crystal ball
+                w.factory(Form("RooCBShape::cb%s(mass,mean%s[0,-10,10],sigma%s[1,0.1,10],alpha%s[5,0,20],n%s[1,0,10])", ul, ul, ul, ul, ul));
+
+                // convolution
+                w.factory(Form("FCONV::%s(mass,bw%s,cb%s)", model_name.c_str(), ul, ul));
+                break;
+            }
+            case Model::MCTemplate:
+            {
+                // gaussian
+                w.factory(Form("Gaussian::gaus%s(mass,mean%s[0,-10,10],sigma%s[2,0,10])", ul, ul, ul));
+
+                // mc template
+                TH1* const h_template = dynamic_cast<TH1*>(hist_template->Clone(Form("h_template_%s", ul)));
+                w.import(*h_template);
+                RooDataHist data_hist(Form("data_hist%s", ul), Form("data_hist%s", ul), RooArgSet(*w.var("mass")), h_template);
+                RooHistPdf hist_pdf(Form("hist_pdf%s", ul), Form("hist_pdf%s", ul), *w.var("mass"), data_hist, /*interpolation_order=*/1);
+                w.import(hist_pdf);
+
+                // convolution
+                w.factory(Form("FCONV::%s(mass,hist_pdf%s,gaus%s)", model_name.c_str(), ul, ul));
+
+                // cleanup
+                delete h_template;
+                break;
+            }
+            case Model::Exponential: 
+                w.factory(Form("Exponential::%s(mass, t%s[-0.1,-1.0,0.0])", model_name.c_str(), ul)); 
+                break;
+
+//             case Model::BreitWignerCB: return new BreitWignerCBPdf(x, label);                     break; 
+//             case Model::MCTemplate:    return new MCTemplateConvGausPdf(x, hist_template, label); break; 
+//             case Model::Exponential:   return new ExponentialPdf(x, label);                       break; 
+//             case Model::Argus:         return new ArgusPdf(x, label);                             break; 
+//             case Model::ErfExp:        return new ErfExpPdf(x, label);                            break; 
+//             case Model::Chebychev:     return new ChebychevPdf(x, label);                         break; 
+//             case Model::ChebyExp:      return new ChebyExpPdf(x, label);                          break; 
+//             case Model::Linear:        return new LinearPdf(x, label);                            break; 
+//             case Model::Poly2:         return new Poly2Pdf(x, label);                             break; 
+//             case Model::Poly3:         return new Poly3Pdf(x, label);                             break; 
+//             case Model::Poly6:         return new Poly6Pdf(x, label);                             break; 
+//             case Model::Poly8:         return new Poly8Pdf(x, label);                             break; 
+//             case Model::LinearExp:     return new LinearExpPdf(x, label);                         break; 
+//             case Model::Poly2Exp:      return new Poly2ExpPdf(x, label);                          break; 
+//             case Model::Poly3Exp:      return new Poly3ExpPdf(x, label);                          break; 
+//             case Model::Poly4Exp:      return new Poly4ExpPdf(x, label);                          break; 
+//             case Model::Poly8Exp:      return new Poly8ExpPdf(x, label);                          break; 
+            default:
+                throw std::invalid_argument("[tnp::AddModelToWorkspace] Error: model not supported");
+        }
+
+        // done 
+        return;
+    }
+
     // get Model::value_type from a string
     // ----------------------------------------------------------------- //
 
@@ -736,6 +810,234 @@ namespace tnp
         return text_box;
     }
 
+    // Perform the fit (with factor)
+    Result PerformSimultaneousFitV2
+    (
+        const Model::value_type sig_pass_model, 
+        const Model::value_type sig_fail_model, 
+        const Model::value_type bkg_pass_model, 
+        const Model::value_type bkg_fail_model, 
+        const TH1* const h_pass, 
+        const TH1* const h_fail,
+        const float mass_low,
+        const float mass_high,
+        const float mass_bin_width,
+        const std::string a_bin_label, 
+        const std::string b_bin_label, 
+        TH1* const h_pass_template,
+        TH1* const h_fail_template
+    )
+    {
+        // test template histogram's existence
+        if (sig_pass_model == Model::MCTemplate && h_pass_template == NULL)
+        {
+            throw std::invalid_argument("[tnp::PerformSumultaneousFit] Error: pass template histogram is NULL!");
+        }
+        if (sig_fail_model == Model::MCTemplate && h_fail_template == NULL)
+        {
+            throw std::invalid_argument("[tnp::PerformSumultaneousFit] Error: fail template histogram is NULL!");
+        }
+
+        // build the RooWorkspace
+        // ----------------------------------------- // 
+
+        // workspace
+        const std::string w_name = lt::string_replace_all(h_pass->GetName(), "h_", "w_name_");
+        RooWorkspace w(w_name.c_str(), /*doCINTexport=*/false);
+
+        // add independent variable (mass)
+        RooRealVar mass("mass", "mass", mass_low, mass_high, "GeV");
+        w.import(mass);
+//         w.factory("mass[80,100]");
+
+        // Define categories
+//         w.factory("Category::sample[\"pass\",\"fail\"]");
+        RooCategory sample("sample","");
+        sample.defineType("pass",1);
+        sample.defineType("fail",2);
+        w.import(sample);
+
+        // signal model (need ptr for polymorphism to work -- references for convenience)
+        const std::string sig_pass_model_name = lt::string_replace_all(h_pass->GetName(), "h_", "model_sig_"); 
+        const std::string sig_fail_model_name = lt::string_replace_all(h_fail->GetName(), "h_", "model_sig_"); 
+        const std::string bkg_pass_model_name = lt::string_replace_all(h_pass->GetName(), "h_", "model_bkg_"); 
+        const std::string bkg_fail_model_name = lt::string_replace_all(h_fail->GetName(), "h_", "model_bkg_"); 
+//         const std::string sig_pass_model_name = "model_sig_pass"; 
+//         const std::string sig_fail_model_name = "model_sig_fail"; 
+//         const std::string bkg_pass_model_name = "model_bkg_pass"; 
+//         const std::string bkg_fail_model_name = "model_bkg_fail"; 
+        AddModelToWorkspace(sig_pass_model, w, sig_pass_model_name, h_pass_template); 
+        AddModelToWorkspace(sig_fail_model, w, sig_fail_model_name, h_fail_template); 
+        AddModelToWorkspace(bkg_pass_model, w, bkg_pass_model_name); 
+        AddModelToWorkspace(bkg_fail_model, w, bkg_fail_model_name); 
+        w.Print();
+        
+        RooAbsPdf& spass_model = *w.pdf(sig_pass_model_name.c_str());
+        RooAbsPdf& sfail_model = *w.pdf(sig_fail_model_name.c_str());
+        RooAbsPdf& bpass_model = *w.pdf(bkg_pass_model_name.c_str());
+        RooAbsPdf& bfail_model = *w.pdf(bkg_fail_model_name.c_str());
+
+//         RooRealVar& mass = *dynamic_cast<RooRealVar*>(w.arg("mass"));
+
+        // print the models used:
+        cout << "Fitting using the following PDF models:" << endl;
+        cout << "sig pass model = " << tnp::GetStringFromModel(sig_pass_model) << endl; 
+        cout << "sig fail model = " << tnp::GetStringFromModel(sig_fail_model) << endl; 
+        cout << "bkg pass model = " << tnp::GetStringFromModel(bkg_pass_model) << endl; 
+        cout << "bkg fail model = " << tnp::GetStringFromModel(bkg_fail_model) << endl; 
+
+        // do the simultaneous fit 
+        // ----------------------------------------- // 
+
+        // count maximums
+        double nsig_max      = h_pass->Integral() + h_fail->Integral();
+        double nbkg_fail_max = h_fail->Integral();
+        double nbkg_pass_max = h_pass->Integral();
+
+        RooRealVar eff("eff", "Efficiency", 0.8 ,0 ,1.0);
+        RooRealVar nsig("nsig", "Signal Yield", 0.80*nsig_max, 0, nsig_max);
+        RooRealVar nbkg_pass("nbkg_pass","Background count in PASS sample", 50, 0, nbkg_pass_max);
+        RooRealVar nbkg_fail("nbkg_fail","Background count in FAIL sample", 0.1*nbkg_fail_max, 0.01, nbkg_fail_max);
+        RooFormulaVar nsig_pass("nsig_pass" ,"eff*nsig"      , RooArgList(eff, nsig));
+        RooFormulaVar nsig_fail("nsig_fail" ,"(1.0-eff)*nsig", RooArgList(eff, nsig));
+        RooFormulaVar ntot_pass("ntot_pass" ,"nsig_pass+nbkg_pass", RooArgList(nsig_pass, nbkg_pass));
+        RooFormulaVar ntot_fail("ntot_fail" ,"nsig_fail+nbkg_fail", RooArgList(nsig_fail, nbkg_fail));
+
+        // add signal and background PDF for the total shape
+        RooExtendPdf esig_pass("esig_pass","esig_pass", spass_model, nsig_pass);
+        RooExtendPdf ebkg_pass("ebkg_pass","ebkg_pass", bpass_model, nbkg_pass);
+        RooAddPdf model_pass("model_pass","Model for PASS sample", RooArgList(esig_pass, ebkg_pass));
+
+        RooExtendPdf esig_fail("esig_fail","esig_fail", sfail_model, nsig_fail);
+        RooExtendPdf ebkg_fail("ebkg_fail","ebkg_fail", bfail_model, nbkg_fail);
+        RooAddPdf model_fail("model_fail","Model for Fail sample", RooArgList(esig_fail, ebkg_fail));
+
+        // import data histograms
+        RooDataHist data_pass("data_pass", "data_pass", RooArgSet(mass), h_pass);
+        RooDataHist data_fail("data_fail", "data_fail", RooArgSet(mass), h_fail);
+        RooDataHist data_comb("data_comb", "data_comb", RooArgList(mass), RooFit::Index(sample), RooFit::Import("pass", data_pass), RooFit::Import("fail", data_fail));  
+
+        // for the total PDF
+        RooSimultaneous total_pdf("total_pdf","total_pdf",sample);
+        total_pdf.addPdf(model_pass, "pass");  
+        total_pdf.addPdf(model_fail, "fail");
+
+        // do the fit
+        RooFitResult *roo_fit_result = total_pdf.fitTo(data_comb, RooFit::Extended(), RooFit::Strategy(1), RooFit::Save());
+
+        // integrate on a subrange
+        mass.setRange("zwindow", mass_low, mass_high);
+        RooAbsReal* int_nsig_pass = esig_pass.createIntegral (mass, RooFit::NormSet(mass), RooFit::Range("zwindow"));
+        RooAbsReal* int_nbkg_pass = ebkg_pass.createIntegral (mass, RooFit::NormSet(mass), RooFit::Range("zwindow"));
+        RooAbsReal* int_ntot_pass = model_pass.createIntegral(mass, RooFit::NormSet(mass), RooFit::Range("zwindow"));
+        RooAbsReal* int_nsig_fail = esig_fail.createIntegral (mass, RooFit::NormSet(mass), RooFit::Range("zwindow"));
+        RooAbsReal* int_nbkg_fail = ebkg_fail.createIntegral (mass, RooFit::NormSet(mass), RooFit::Range("zwindow"));
+        RooAbsReal* int_ntot_fail = model_fail.createIntegral(mass, RooFit::NormSet(mass), RooFit::Range("zwindow"));
+
+        // conventience varariables for the full fit counts
+        Result::value_t npass_sig = {nsig_pass.getVal(), nsig_pass.getPropagatedError(*roo_fit_result)};
+        Result::value_t npass_bkg = {nbkg_pass.getVal(), nbkg_pass.getPropagatedError(*roo_fit_result)};
+        Result::value_t npass_tot = {ntot_pass.getVal(), ntot_pass.getPropagatedError(*roo_fit_result)};
+        Result::value_t nfail_sig = {nsig_fail.getVal(), nsig_fail.getPropagatedError(*roo_fit_result)};
+        Result::value_t nfail_bkg = {nbkg_fail.getVal(), nbkg_fail.getPropagatedError(*roo_fit_result)};
+        Result::value_t nfail_tot = {ntot_fail.getVal(), ntot_fail.getPropagatedError(*roo_fit_result)};
+        Result::value_t data_eff  = {eff.getVal()      , eff.getPropagatedError(*roo_fit_result)      };
+
+        // the value integrated on the subrange
+        Result::value_t int_npass_sig = {int_nsig_pass->getVal() * npass_sig.value, int_nsig_pass->getVal() * npass_sig.error};
+        Result::value_t int_npass_bkg = {int_nbkg_pass->getVal() * npass_bkg.value, int_nbkg_pass->getVal() * npass_bkg.error};
+        Result::value_t int_npass_tot = {int_ntot_pass->getVal() * npass_tot.value, int_ntot_pass->getVal() * npass_tot.error};
+        Result::value_t int_nfail_sig = {int_nsig_fail->getVal() * nfail_sig.value, int_nsig_fail->getVal() * nfail_sig.error};
+        Result::value_t int_nfail_bkg = {int_nbkg_fail->getVal() * nfail_bkg.value, int_nbkg_fail->getVal() * nfail_bkg.error};
+        Result::value_t int_nfail_tot = {int_ntot_fail->getVal() * nfail_tot.value, int_ntot_fail->getVal() * nfail_tot.error};
+
+        // the new efficiency
+        Result::value_t num = int_npass_sig;
+        Result::value_t den = {int_npass_sig.value + int_nfail_sig.value, sqrt(pow(int_npass_sig.error,2) + pow(int_nfail_sig.error,2))};
+        Result::value_t int_data_eff = {num.value/den.value, data_eff.error};
+ 
+        // results of eff */
+        Result simple_result
+        (
+             data_eff.value, 
+             data_eff.error,
+             num.value,
+             num.error,
+             den.value,
+             den.error,
+             int_npass_bkg.value,
+             int_npass_bkg.error
+        );
+ 
+        // passing plot
+        simple_result.cpass->cd(); 
+        RooPlot *mframe_pass = mass.frame(RooFit::Bins(static_cast<int>(fabs(mass_high-mass_low)/2.0)));
+        data_pass.plotOn(mframe_pass, RooFit::MarkerStyle(kFullCircle), RooFit::MarkerSize(0.8), RooFit::DrawOption("ZP"));
+        model_pass.plotOn(mframe_pass);
+        model_pass.plotOn(mframe_pass,RooFit::Components("ebkg_pass"), RooFit::LineStyle(kDashed), RooFit::LineColor(kRed));
+        mframe_pass->SetTitle("Passing Probes");
+        mframe_pass->Draw();
+        TPaveText *a_box         = CreateTextBox(0.15, 0.80, 0.41, 0.85, a_bin_label); a_box->Draw();
+        TPaveText *b_box         = CreateTextBox(0.15, 0.75, 0.41, 0.80, b_bin_label); b_box->Draw();
+        TPaveText *npass_box     = CreateTextBox(0.15, 0.70, 0.33, 0.75, Form("%1.0f Events", nbkg_pass_max)); npass_box->Draw();
+        TPaveText *eff_box       = CreateTextBox(0.65, 0.80, 0.85, 0.84, Form("#varepsilon = %1.3f #pm %1.3f"   , int_data_eff.value , int_data_eff.error )); eff_box->Draw();
+        TPaveText *nsig_pass_box = CreateTextBox(0.65, 0.75, 0.85, 0.79, Form("N^{pass}_{sig} = %1.0f #pm %1.0f", npass_sig.value    , npass_sig.error    )); nsig_pass_box->Draw();
+        TPaveText *nbkg_pass_box = CreateTextBox(0.65, 0.70, 0.85, 0.74, Form("N^{pass}_{bkg} = %1.0f #pm %1.0f", npass_bkg.value    , npass_bkg.error    )); nbkg_pass_box->Draw();
+        TPaveText *ntot_pass_box = CreateTextBox(0.65, 0.65, 0.85, 0.69, Form("N^{pass}_{tot} = %1.0f #pm %1.0f", npass_tot.value    , npass_tot.error    )); ntot_pass_box->Draw();
+        TPaveText *nsig_fail_box = CreateTextBox(0.65, 0.60, 0.85, 0.64, Form("N^{fail}_{sig} = %1.0f #pm %1.0f", nfail_sig.value    , nfail_sig.error    )); nsig_fail_box->Draw();
+        TPaveText *nbkg_fail_box = CreateTextBox(0.65, 0.55, 0.85, 0.59, Form("N^{fail}_{bkg} = %1.0f #pm %1.0f", nfail_bkg.value    , nfail_bkg.error    )); nbkg_fail_box->Draw();
+        TPaveText *ntot_fail_box = CreateTextBox(0.65, 0.50, 0.85, 0.54, Form("N^{fail}_{tot} = %1.0f #pm %1.0f", nfail_tot.value    , nfail_tot.error    )); ntot_fail_box->Draw();
+
+        // failing plot
+        simple_result.cfail->cd(); 
+        RooPlot *mframe_fail = mass.frame(RooFit::Bins(static_cast<int>(fabs(mass_high-mass_low)/mass_bin_width)));
+        data_fail.plotOn(mframe_fail, RooFit::MarkerStyle(kFullCircle), RooFit::MarkerSize(0.8), RooFit::DrawOption("ZP"));
+        model_fail.plotOn(mframe_fail);
+        model_fail.plotOn(mframe_fail,RooFit::Components("ebkg_fail"), RooFit::LineStyle(kDashed), RooFit::LineColor(kRed));
+        mframe_fail->SetTitle("Failing Probes");
+        mframe_fail->Draw();
+        a_box->Draw();
+        b_box->Draw();
+        TPaveText *nfail_box = CreateTextBox(0.15, 0.70, 0.33, 0.75, Form("%1.0f Events", nbkg_fail_max)); nfail_box->Draw();
+        eff_box->Draw();
+        nsig_pass_box->Draw();
+        nbkg_pass_box->Draw();
+        ntot_pass_box->Draw();
+        nsig_fail_box->Draw();
+        nbkg_fail_box->Draw();
+        ntot_fail_box->Draw();
+
+        // print the results
+        CTable t1;
+        t1.useTitle();
+        t1.setTitle("data fit results full range");
+        t1.setTable() (                         "value",         "error")
+                      ( "signal_pass" , npass_sig.value, npass_sig.error)
+                      ( "signal_fail" , nfail_sig.value, nfail_sig.error)
+                      ( "bkg_pass"    , npass_bkg.value, npass_bkg.error)
+                      ( "bkg_fail"    , nfail_bkg.value, nfail_bkg.error)
+                      ( "total_pass"  , npass_tot.value, npass_tot.error)
+                      ( "total_fail"  , nfail_tot.value, nfail_tot.error)
+                      ( "eff"         , data_eff.value , data_eff.error );
+        t1.print();
+
+        CTable t2;
+        t2.useTitle();
+        t2.setTitle("data fit results subrange");
+        t2.setTable() (                                 "value",         "error")
+                      ( "signal_pass" , int_npass_sig.value, int_npass_sig.error)
+                      ( "signal_fail" , int_nfail_sig.value, int_nfail_sig.error)
+                      ( "bkg_pass"    , int_npass_bkg.value, int_npass_bkg.error)
+                      ( "bkg_fail"    , int_nfail_bkg.value, int_nfail_bkg.error)
+                      ( "total_pass"  , int_npass_tot.value, int_npass_tot.error)
+                      ( "total_fail"  , int_nfail_tot.value, int_nfail_tot.error)
+                      ( "eff"         , int_data_eff.value , int_data_eff.error );
+        t2.print();
+ 
+        // done 
+        return simple_result;
+    }
+
     // Perform the fit
     Result PerformSimultaneousFit
     (
@@ -790,7 +1092,6 @@ namespace tnp
         cout << "sig fail model = " << tnp::GetStringFromModel(sig_fail_model) << endl; 
         cout << "bkg pass model = " << tnp::GetStringFromModel(bkg_pass_model) << endl; 
         cout << "bkg fail model = " << tnp::GetStringFromModel(bkg_fail_model) << endl; 
-        
 
         // count maximums
         double nsig_max      = h_pass->Integral() + h_fail->Integral();

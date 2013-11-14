@@ -101,6 +101,24 @@ namespace tnp
         TH1* const h_fail_template = NULL
     );
 
+    // Perform simultaneous fit
+    Result PerformSimultaneousFitV2
+    (
+        const Model::value_type sig_pass_model, 
+        const Model::value_type sig_fail_model, 
+        const Model::value_type bkg_pass_model, 
+        const Model::value_type bkg_fail_model, 
+        const TH1* const h_pass, 
+        const TH1* const h_fail,
+        const float mass_low = 60.0,
+        const float mass_high = 120.0,
+        const float mass_bin_width = 2.0,
+        const std::string a_bin_label = "", 
+        const std::string b_bin_label = "", 
+        TH1* const h_pass_template = NULL,
+        TH1* const h_fail_template = NULL
+    );
+
     // Perform simple count (no background fitting/subtraction) 
     Result PerformSimpleCount
     (
