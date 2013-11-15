@@ -22,11 +22,6 @@ namespace tnp
             Poly3,         // 3rd order polynomial
             Poly6,         // 6th order polynomial
             Poly8,         // 8th order polynomial
-            LinearExp,     // Linear convolved with exponential
-            Poly2Exp,      // 2nd order polynomial convolved with exponential
-            Poly3Exp,      // 3rd order polynomial convolved with exponential
-            Poly4Exp,      // 4th order polynomial convolved with exponential
-            Poly8Exp,      // 8th order polynomial convolved with exponential
             Chebychev,     // Chebychev polynomial 
             ChebyExp,      // Chebychev polynomial convolved with exponential
             static_size

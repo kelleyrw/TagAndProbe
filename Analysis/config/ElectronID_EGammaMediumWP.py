@@ -53,18 +53,17 @@ tnp_parameters = cms.PSet(
 	mass_bin_width = cms.double(2.0),   # GeV
 	
 	# datasets to run on
-# 	datasets = cms.VPSet(dy_full, single_el),                                     
-	datasets = cms.VPSet(single_el),
+	datasets = cms.VPSet(dy_full, single_el),                                     
 
 	## bins for the observables
 	## supported pt, eta, phi, and # vertices
 	## note: for eta and phi, no negative bins means use |eta| and |phi|, respectively
 	pt_bins   = cms.vdouble(10, 15, 20, 30, 40, 50, 200),
 	eta_bins  = cms.vdouble(0, 0.8, 1.4442, 1.566, 2.0, 2.5),
-# 	phi_bins  = cms.vdouble(0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.15),
-# 	nvtx_bins = cms.vdouble(0, 5, 10, 15, 20, 25, 30, 35, 40),
-	phi_bins  = cms.vdouble(),               
-	nvtx_bins = cms.vdouble(),                    
+	phi_bins  = cms.vdouble(0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.15),
+	nvtx_bins = cms.vdouble(0, 5, 10, 15, 20, 25, 30, 35, 40),
+# 	phi_bins  = cms.vdouble(),               
+# 	nvtx_bins = cms.vdouble(),                    
 	
 	## selection (from Measurements.h/cc) 
 	numerator   = cms.string("EGammaMediumWPNum"  ),
@@ -137,8 +136,8 @@ tnp_parameters = cms.PSet(
 		"MCTemplate"   , "MCTemplate"   , "Exponential", "ErfExp"     , # eta0, pt2
 		"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # eta1, pt2 
 		"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"     , # eta2, pt2 # crack electrons (1.4442 < |eta| < 1.566)
-		"MCTemplate"   , "MCTemplate"   , "Exponential", "Exponential", # eta3, pt2
-		"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "Exponential"  # eta4, pt2
+		"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"     , # eta3, pt2
+		"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"       # eta4, pt2
 	,
 		"MCTemplate"   , "MCTemplate"   , "ErfExp"     , "ErfExp"     , # eta0, pt3
 		"MCTemplate"   , "MCTemplate"   , "Poly3"      , "Poly3"      , # eta1, pt3
