@@ -79,7 +79,22 @@ namespace tnp
             const float el_probe_pt  = probe().pt();
             const float el_tag_pt    = tag().pt();
             const float el_d0        = fabs(d0vtx()); 
-            const float el_iso       = (pfchiso03() + TMath::Max(0.0f, pfemiso03() + pfnhiso03() - ea03() * TMath::Max(0.0f, rhoIsoAllCentral())))/el_probe_pt;
+
+	    // Fix for ea03 variable (LeptonTree uses 2011 constants)
+	    // Take from https://github.com/cmstas/CORE/blob/master/electronSelections.cc#L1191
+	    // Check with https://twiki.cern.ch/twiki/bin/view/CMS/EgammaEARhoCorrection#Isolation_cone_R_0_3
+	    const float etaAbs = fabs(sceta());
+	    float ea03_2012 = 0; // use this instead of ea03()
+	    // get effective area
+	    if      (etaAbs <= 1.0                  ) { ea03_2012 = 0.13;}
+	    else if (etaAbs > 1.0 && etaAbs <= 1.479) { ea03_2012 = 0.14;}
+	    else if (etaAbs > 1.479 && etaAbs <= 2.0) { ea03_2012 = 0.07;}
+	    else if (etaAbs > 2.0 && etaAbs <= 2.2  ) { ea03_2012 = 0.09;}
+	    else if (etaAbs > 2.2 && etaAbs <= 2.3  ) { ea03_2012 = 0.11;}
+	    else if (etaAbs > 2.3 && etaAbs <= 2.4  ) { ea03_2012 = 0.11;}
+	    else if (etaAbs > 2.4                   ) { ea03_2012 = 0.14;}
+
+            const float el_iso       = (pfchiso03() + TMath::Max(0.0f, pfemiso03() + pfnhiso03() - ea03_2012 * TMath::Max(0.0f, rhoIsoAllCentral())))/el_probe_pt;
 
             // EGamma Medium WP (2012)
             // https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaCutBasedIdentification 
@@ -89,9 +104,7 @@ namespace tnp
             const float egamma_iso_cut        = (el_is_endcap ? (el_probe_pt < 20.0 ? 0.10 : 0.15) : 0.15);  // Medium WP value 
             const float egamma_tag_pt_cut     = 25.0;
             const bool  egamma_trig_tag       = (HLT_Ele17_Ele8_Mass50_LeadingLeg_tag()  != 0) or 
-                                                (HLT_Ele17_Ele8_Mass50_TrailingLeg_tag() != 0) or 
-                                                (HLT_Ele20_SC4_Mass50_LeadingLeg_tag()   != 0) or 
-                                                (HLT_Ele20_SC4_Mass50_TrailingLeg_tag()  != 0);
+	                                        (HLT_Ele20_SC4_Mass50_LeadingLeg_tag()   != 0);
             const bool egamma_passes_pt       = (el_tag_pt > egamma_tag_pt_cut);
             const bool egamma_passes_trig_tag = (is_data ? egamma_trig_tag : true);
             const bool egamma_passes_id       = ((mediumId() & PassNoIso) == PassNoIso);
