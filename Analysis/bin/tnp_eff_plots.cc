@@ -548,6 +548,10 @@ try
                     }
                 }
             }
+	    // add histograms to hist container
+	    hc.Add(h_num);
+	    hc.Add(h_den);
+	    hc.Add(h_eff);
         }
 
 
