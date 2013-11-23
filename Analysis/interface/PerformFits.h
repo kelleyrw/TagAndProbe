@@ -14,6 +14,7 @@ namespace tnp
         {
             BreitWignerCB, // Breit-Wigner convolved with Crystal Ball function
             MCTemplate,    // MC Template, need to provide histogram 
+            MCTemplateCB,    // MC Template, need to provide histogram 
             Exponential,   // Exponential 
             Argus,         // Argus function (http://en.wikipedia.org/wiki/ARGUS_distribution)
             ErfExp,        // Error function convolved with Exponential

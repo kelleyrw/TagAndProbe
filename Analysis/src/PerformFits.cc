@@ -81,7 +81,7 @@ namespace tnp
             case Model::MCTemplate:
             {
                 // gaussian
-                w.factory(Form("Gaussian::gaus%s(mass,mean%s[0,-10,10],sigma%s[2,0,10])", ul, ul, ul));
+	         w.factory(Form("Gaussian::gaus%s(mass,mean%s[0,-10,10],sigma%s[2,0,10])", ul, ul, ul));
 
                 // template histogram
                 TH1* const h_template = dynamic_cast<TH1*>(w.obj(Form("h_template%s", ul)));
@@ -97,6 +97,28 @@ namespace tnp
 
                 // convolution
                 w.factory(Form("FCONV::%s(mass,hist_pdf%s,gaus%s)", model_name.c_str(), ul, ul));
+                break;
+            }
+	    case Model::MCTemplateCB:
+            {
+                // crystal ball
+	      //                w.factory(Form("RooCBShape::cb%s(mass,mean%s[0,-10,10],sigma%s[1,0.1,10],alpha%s[5,0,20],n%s[1,0,10])", ul, ul, ul, ul, ul));
+                w.factory(Form("RooCBShape::cb%s(mass,mean[0,-3,3],sigma[0.1,0,5],alpha[5,0,20],n[1,0,20])", ul));
+
+                // template histogram
+                TH1* const h_template = dynamic_cast<TH1*>(w.obj(Form("h_template%s", ul)));
+                if (h_template == NULL)
+                {
+                    throw std::invalid_argument("[tnp::AddModelToWorkspace] Error: template histogram is NULL!");
+                }
+
+                // mc template
+                RooDataHist data_hist(Form("data_hist%s", ul), Form("data_hist%s", ul), RooArgSet(*w.var("mass")), h_template);
+                w.import(data_hist);
+                w.factory(Form("HistPdf::hist_pdf%s(mass, data_hist%s, 1)", ul, ul));
+
+                // convolution
+                w.factory(Form("FCONV::%s(mass,hist_pdf%s,cb%s)", model_name.c_str(), ul, ul));
                 break;
             }
             case Model::Exponential: 
@@ -172,6 +194,7 @@ namespace tnp
     {
         if(lt::string_lower(model_name) == "breitwignercb") {return Model::BreitWignerCB;}
         if(lt::string_lower(model_name) == "mctemplate"   ) {return Model::MCTemplate;   }
+        if(lt::string_lower(model_name) == "mctemplatecb" ) {return Model::MCTemplateCB; }
         if(lt::string_lower(model_name) == "exponential"  ) {return Model::Exponential;  }
         if(lt::string_lower(model_name) == "argus"        ) {return Model::Argus;        }
         if(lt::string_lower(model_name) == "erfexp"       ) {return Model::ErfExp;       }
@@ -196,6 +219,7 @@ namespace tnp
             {
                 case Model::BreitWignerCB : return "BreitWignerCB";
                 case Model::MCTemplate    : return "MCTemplate";
+                case Model::MCTemplateCB  : return "MCTemplateCB";
                 case Model::Exponential   : return "Exponential";
                 case Model::Argus         : return "Argus";
                 case Model::ErfExp        : return "ErfExp";
@@ -350,14 +374,14 @@ namespace tnp
         const std::string bkg_fail_model_name = "model_bkg_fail"; 
 
         // add template hist
-        if (sig_pass_model == Model::MCTemplate)
+        if (sig_pass_model == Model::MCTemplate || sig_pass_model == Model::MCTemplateCB)
         {
             const std::string h_pass_newname = lt::string_replace_first(sig_pass_model_name, "model_", "h_template_"); 
             TH1* const h_pass_template_temp = dynamic_cast<TH1*>(h_pass_template->Clone(h_pass_newname.c_str()));
             w.import(*h_pass_template_temp);
             delete h_pass_template_temp;
         }
-        if (sig_fail_model == Model::MCTemplate)
+        if (sig_fail_model == Model::MCTemplate || sig_pass_model == Model::MCTemplateCB)
         {
             const std::string h_fail_newname = lt::string_replace_first(sig_fail_model_name, "model_", "h_template_"); 
             TH1* const h_fail_template_temp = dynamic_cast<TH1*>(h_fail_template->Clone(h_fail_newname.c_str()));
