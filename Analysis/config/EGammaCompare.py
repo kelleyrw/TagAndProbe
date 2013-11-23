@@ -25,19 +25,19 @@ from datasets import *
 el_id = cms.PSet(
 	
 	## verbosity (for trouble shooting)
-	verbose = cms.bool(False),
+	verbose = cms.bool(True),
 
 	## label to give unique name
 	output_label = cms.string("compare"),
 
 	## path to the efficiency results to compare 
-	eff_results_path = cms.string(analysis_path+"/plots/ElectronID_EGammaMediumWP/electron/EGammaMediumWPDenID_EGammaMediumWPNum"),
+	eff_results_path = cms.string(analysis_path+"/plots/ElectronID_EGammaMediumWP/electron/EGammaMediumWPDenBoth_EGammaMediumWPNum"),
 
 	## first result to compare
-	dataset1 = single_el,
+	dataset1 = double_el,
 
 	## second result to compare
-	dataset2 = dy_full,
+	dataset2 = dy_full2,
 
 	## suffix to print the plots (before the fit)
 	## blank means do not print
