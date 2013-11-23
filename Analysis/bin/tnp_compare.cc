@@ -283,6 +283,16 @@ try
             dataset2_eff_tables.push_back(rt::CreateTableFromHist(hc2  ["h_eff_pt_vs_eta"], Form("%s Efficiency vs $p_{T}$ and $\\eta$", dataset2.m_title.c_str()), "$p_{T}$", "$\\eta$", "", "", "1.2", "1.0", "1.2", true));
             scale_factor_tables.push_back(rt::CreateTableFromHist(hc_sf["h_sf_pt_vs_eta" ], "Scale Factor vs $p_{T}$ and $\\eta$", "$p_{T}$", "$\\eta$", "", "", "1.2", "1.0", "1.2", true));
             compare_plots.push_back(CreateScaleFactorPlot2D(hc_sf["h_sf_pt_vs_eta"], "Scale Factor vs p_{T} and #eta;#eta;p_{T} (GeV);Efficiency", dataset1.m_title, dataset2.m_title, "colz"));
+	    // also compare plots per Eta region
+	    for (int i = 1; i <= hc1["h_eff_pt_vs_eta"]->GetNbinsX(); i++ ) {
+	      float begin = hc1  ["h_eff_pt_vs_eta"]->GetXaxis()->GetBinLowEdge(i);
+	      float end   = hc1  ["h_eff_pt_vs_eta"]->GetXaxis()->GetBinUpEdge(i);
+	      TH1 * proj1 = rt::MakeProjectionPlot( ((TH2*) hc1  ["h_eff_pt_vs_eta"]), "y", Form("h_eff_pt_eta_%.2f_%.2f", begin, end), "h1_eff_pt_eta", begin, end);
+	      TH1 * proj2 = rt::MakeProjectionPlot( ((TH2*) hc2  ["h_eff_pt_vs_eta"]), "y", Form("h2_eff_pt_eta_%.2f_%.2f", begin, end), "h2_eff_pt_eta", begin, end);
+	      TH1 * projSF= rt::MakeProjectionPlot( ((TH2*) hc_sf["h_sf_pt_vs_eta" ]), "y", Form("h_sf_pt_eta_%.2f_%.2f", begin, end), "h_sf_pt_eta"  , begin, end);	      
+	      compare_plots.push_back(CreateEfficienyPlot1D(proj1, proj2, projSF, Form("Efficiency vs p_{T} (\\eta: %.2f - %.2f);p_{T} (GeV); Efficiency", begin, end), dataset1.m_title, dataset2.m_title));
+	    }
+
         }
 
         // 2D: eff(eta, phi)
