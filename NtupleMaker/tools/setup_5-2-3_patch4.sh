@@ -32,7 +32,7 @@ cvs up -r 1.3 EGamma/EGammaAnalysisTools/interface/ElectronEffectiveArea.h
 
 # for Si Xie thesis MVA
 # using combined ID+Isolation
-cvs co -r HWWID_V00-00-00 HiggsAnalysis/HiggsToWW2Leptons
+git cms-cvs-history import HWWID_V00-00-00 HiggsAnalysis/HiggsToWW2Leptons
 
 # 2012 HZZ ID+Iso combined MVA
 cvs co -r R2012A_V2 -d Muon/MuonAnalysisTools UserCode/sixie/Muon/MuonAnalysisTools
@@ -41,8 +41,8 @@ cvs co -r R2012A_V2 -d Muon/MuonAnalysisTools UserCode/sixie/Muon/MuonAnalysisTo
 cvs co -r V00-02-05 -d CMGTools/External UserCode/CMG/CMGTools/External
 
 # emulate pf no pileup (these tags are for 52X - may run into problems in earlier releases)
-cvs co -r V00-03-11 CommonTools/ParticleFlow 
-cvs co -r V15-01-06 RecoParticleFlow/PFProducer 
+git cms-cvs-history import V00-03-11 CommonTools/ParticleFlow
+git cms-cvs-history import V15-01-06 RecoParticleFlow/PFProducer
 
 if [ $? -eq 0 ]; then
     echo "\n[TNP] checkout complete!\n"
